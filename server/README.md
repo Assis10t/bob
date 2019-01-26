@@ -1,6 +1,6 @@
 # B.O.B. Server
 
-You need `node v10+` and `npm v6+` to run the server.
+You need `node v10+` and `npm v6+` to run the server. For code formatting, please also [install the Prettier plugin on your editor of choice](https://prettier.io/docs/en/editors.html). It is recommended to set it up so that the plugin formats whenever you save a file.
 
 #### Installation
 ```
