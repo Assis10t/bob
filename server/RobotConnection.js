@@ -3,14 +3,19 @@ const realNet = require('net')
 const robotConnectionFactory = net =>
     class RobotConnection {
         constructor() {
-            this.onConnectedListeners = []
-            this.onDataListeners = []
-            this.server = net.createServer(socket => {
+            this._onConnectedListeners = []
+            this._onDataListeners = []
+            this._server = null
+            this.isConnected = false
+        }
+
+        start() {
+            this._server = net.createServer(socket => {
                 this.isConnected = true
-                this.onConnectedListeners.forEach(listener => listener())
+                this._onConnectedListeners.forEach(listener => listener())
 
                 socket.on('data', data => {
-                    this.onDataListeners.forEach(listener =>
+                    this._onDataListeners.forEach(listener =>
                         listener(data.toString())
                     )
                     //TODO: Parse the data before notifying listener.
@@ -22,20 +27,30 @@ const robotConnectionFactory = net =>
                 })
             })
 
-            this.server.listen(8000, () => {
+            this._server.listen(8000, () => {
                 console.log('Server is listening.')
             })
         }
 
+        stop() {
+            this._server.close(() => {
+                this._server = null
+            })
+        }
+
+        isActive() {
+            return !!this._server
+        }
+
         onConnected(listener) {
-            this.onConnectedListeners.push(listener)
+            this._onConnectedListeners.push(listener)
             if (this.isConnected) {
                 listener()
             }
         }
 
         onData(listener) {
-            this.onDataListeners.push(listener)
+            this._onDataListeners.push(listener)
         }
     }
 

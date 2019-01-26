@@ -1,5 +1,7 @@
 const RobotConnection = require('./RobotConnection')
 
-RobotConnection.getInstance().onData(data => {
+const connection = new RobotConnection()
+connection.start()
+connection.onData(data => {
     console.log(data)
 })
