@@ -29,3 +29,4 @@ class Toddler:
         self.camera.imshow('Camera', image)
         time.sleep(0.05)
 
+
