@@ -6,13 +6,29 @@ changes won't propagate unless you deploy them to the server.
 
 ## Usage
 
-### Set Up
+### File Structure
 
-In order to deploy Firebase apps from your machine, you must first install the
-packages needed.
+Firebase is split into separate parts, subsections of the directory deal with different services. Since we are only using functions this is the only directory.
 
 ```
-$ npm install firebase firebase-functions firebase-admin
+firebase
+├── README.md
+├── firebase.json
+├── package-lock.json
+└── functions
+    ├── index.js
+    ├── node_modules
+    ├── package-lock.json
+    └── package.json
+
+```
+
+### Set Up
+
+In order to deploy Firebase apps from your machine, you must first install the packages needed. From the `functions` directory do the following.
+
+```
+$ npm install
 ```
 
 ### Writing Functions
@@ -32,4 +48,10 @@ This will prompt you to enter your details. If you have not been given access to
 **It is very important when deploying that you only deploy your function incase you have broken another!**
 ```
 $ firebase deploy --only functions:<YOUR_FUNCTION>
+```
+
+Once finished, make sure to log out!
+
+```
+$ firebase logout
 ```
