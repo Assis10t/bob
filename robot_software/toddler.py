@@ -18,13 +18,13 @@ class Toddler:
         self.getSensors = IO.interface_kit.getSensors
         self.mc = IO.motor_control
         self.sc = IO.servo_control
-        follower = LineFollower(IO)
+        self.follower = LineFollower(IO)
 
     def control(self):
         print('{}\t{}'.format(self.getSensors(), self.getInputs()))
         # self.mc.setMotor(self.MOTOR_FRONT_LEFT, 1)
         # self.mc.setMotor(self.MOTOR_FRONT_RIGHT, 1)
-        follower.motor_speed()
+        self.follower.motor_speed()
         time.sleep(0.5)
 
     def vision(self):
