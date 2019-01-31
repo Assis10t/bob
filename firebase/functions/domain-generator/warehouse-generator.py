@@ -20,7 +20,6 @@ output = file("warehouse_world.txt", "w+")
 # Assues rectangular layout
 # define each square
 
-print("Generating Warehouse States")
 for row in range(0,len(warehouse_floor)):
     for column in range(0,len(warehouse_floor[row])):
         if (warehouse_floor[row][column]  > 0):
