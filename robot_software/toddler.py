@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import time
-import numpy
-import cv2
 from lineFollower import LineFollower
 
 class Toddler:
