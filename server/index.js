@@ -2,6 +2,7 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const db = require('./db')
 const model = require('./model')
+const bonjour = require('bonjour')()
 
 const PORT = process.env.PORT || 9000
 
@@ -19,6 +20,9 @@ app.use((req, res, next) => {
     next()
 })
 
+app.get('/ping',(req,res) => {
+  res.send("pong")
+})
 app.get('/order', (req, res, next) =>
     model
         .getAllOrders()
@@ -61,4 +65,7 @@ app.use((err, req, res, next) => {
     next()
 })
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}.`))
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}.`)
+  bonjour.publish({ name: 'My Web Server', type: 'http', port: PORT })
+})
