@@ -11,11 +11,17 @@ class DetectLine:
         self.shut_down = False
 
     def run(self):
-        cs = ev3.ColorSensor()
-        assert cs.connected
+        csbl = ev3.ColorSensor('in2') # colour sensor back left
+        csbr = ev3.ColorSensor('in1') # colour sensor back right
+        assert csbl.connected
+        assert csbr.connected
 
-        cs.mode = 'COL-REFLECT' # measure light intensity
-        #cs.mode = 'COL-COLOR' # measure colour
+        #csbl.mode = 'COL-REFLECT' # measure light intensity
+        #csbl.mode = 'COL-COLOR' # measure colour
+        #csbr.mode = 'COL-COLOR'  # measure colour
+
+        csbl.mode = 'COL-REFLECT'  # measure light intensity
+        csbr.mode = 'COL-REFLECT'  # measure light intensity
 
         # motors
         flm = ev3.LargeMotor('outA')  # front-left motor
@@ -38,12 +44,12 @@ class DetectLine:
 
         # initial measurement when using one sensor to callibrate
         # place sensor left half on white, right half on black
-        target_value = cs.value()
+        #target_value = cs.value()
 
         # Start the main loop
         while not self.shut_down:
             # Calculate steering using PID algorithm
-            error = target_value - cs.value()
+            error = csbl.value() - csbr.value()
             integral += (error * dt)
             derivative = (error - previous_error) / dt
 
