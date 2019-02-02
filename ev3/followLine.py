@@ -11,8 +11,8 @@ class DetectLine:
         self.shut_down = False
 
     def run(self):
-        csbl = ev3.ColorSensor('in2') # colour sensor back left
-        csbr = ev3.ColorSensor('in1') # colour sensor back right
+        csbl = ev3.ColorSensor('in2')  # colour sensor back left
+        csbr = ev3.ColorSensor('in1')  # colour sensor back right
         assert csbl.connected
         assert csbr.connected
 
@@ -29,8 +29,8 @@ class DetectLine:
         sm = ev3.LargeMotor('outC')   # side motor
         #sm.run_timed(speed_sp=300, time_sp=1000)
 
-        speed = 360 / 2.5   # deg/sec, [-1000, 1000]
-        dt = 250  # milliseconds
+        speed = 360 / 2   # deg/sec, [-1000, 1000]
+        dt = 50  # milliseconds  -  represents change in time since last sensor reading/movement
         stop_action = "coast"
 
         # TODO: tune parameters, p then d then i (i will probably be very small)
@@ -56,11 +56,11 @@ class DetectLine:
             # u zero:     on target,  drive forward
             # u positive: too bright, turn right
             # u negative: too dark,   turn left
-
+            # u is torque (See IVR lecture on Control
             u = (Kp * error) + (Ki * integral) + (Kd * derivative)
 
             # limit u to safe values: [-1000, 1000] deg/sec
-            if speed + abs(u) > 1000:
+            if speed + abs(u) > 1000:  # reduce u if speed and torque are too high
                 if u >= 0:
                     u = 1000 - speed
                 else:
@@ -73,9 +73,13 @@ class DetectLine:
                 flm.run_timed(time_sp=dt, speed_sp=-(speed - u))
                 sleep(dt / 1000)
             else:
-                frm.run_timed(time_sp=dt, speed_sp=-(speed - u))
-                flm.run_timed(time_sp=dt, speed_sp=-(speed + u))
+                frm.run_timed(time_sp=dt, speed_sp=-(speed + u))
+                flm.run_timed(time_sp=dt, speed_sp=-(speed - u))
                 sleep(dt / 1000)
+
+            #print("u {}".format(u))
+            #print("frm {}".format(frm.speed_sp))
+            #print("flm {}\n".format(flm.speed_sp))
 
             previous_error = error
 
@@ -87,8 +91,8 @@ class DetectLine:
                 print("[Pause]")
                 self.pause()
 
-            # 'Pause' method
 
+    # 'Pause' method
     def pause(self, pct=0.0, adj=0.01):
         while self.btn.right or self.btn.left:  # ...wait 'right' button to unpause
             ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.AMBER, pct)
