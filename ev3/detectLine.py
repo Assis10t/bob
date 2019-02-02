@@ -96,8 +96,6 @@ class DetectLine:
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.GREEN)
 
 
-
-
 # Main function
 if __name__ == "__main__":
         robot = DetectLine()
