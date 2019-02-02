@@ -2,7 +2,7 @@
 
 ### Installation
 
-```bash
+```
 npm install
 ```
 
@@ -13,15 +13,15 @@ npm start
 
 ### Development
 Instead of `npm start`, use:
-```bash
+```
 npm run dev
 ```
 This will restart the server whenever you change a file.
 
-*Note: Please install the [Prettier Plugin](https://prettier.io/docs/en/editors.html) on your preferred text editor.*
+*Note: Please install the [Prettier Plugin](https://prettier.io/docs/en/editors.html) on your preferred text editor, and set it up to __format on save__. This will automatically format the code to be more readable.*
 
 ### Running tests
-```bash
+```
 npm test
 ```
 
