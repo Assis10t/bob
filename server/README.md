@@ -10,12 +10,24 @@ npm install
 ```
 npm start
 ```
-This will start the server on port `9000`. To change it run:
+
+### Development
+Instead of `npm start`, use:
 ```bash
-node index.js <port>
+npm run dev
 ```
+This will restart the server whenever you change a file.
+
+*Note: Please install the [Prettier Plugin](https://prettier.io/docs/en/editors.html) on your preferred text editor.*
 
 ### Running tests
 ```bash
 npm test
+```
+
+### Configuration
+Change these environment variables before running the server:
+```
+PORT=9000                            # Port the server will run on.
+MONGO=mongodb://localhost:27017/db   # URL of the mongo instance
 ```

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js 9000",
+    "start": "PORT=9000 node index.js",
+    "dev": "PORT=9000 nodemon index.js",
     "test": "jest"
   },
   "repository": {
@@ -18,9 +19,12 @@
   },
   "homepage": "https://github.com/Assis10t/assis10t#readme",
   "devDependencies": {
-    "jest": "^24.0.0"
+    "jest": "^24.0.0",
+    "nodemon": "^1.18.9"
   },
   "dependencies": {
-    "express": "^4.16.4"
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "mongodb": "^3.1.13"
   }
 }
