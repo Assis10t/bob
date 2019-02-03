@@ -28,6 +28,23 @@ const factory = db => ({
                 .insertOne(orderData, (err, order) => {
                     err ? rej(err) : res(orderData)
                 })
+        }),
+    addJob: jobData => 
+        new Promise((res, rej) => {
+            db()
+                .collection('jobs')
+                .insertOne(jobData, (err,job) => {
+                    err ? rej(err) : res(jobData)
+                })
+        }),
+    getAllJobs: () =>
+    new Promise((res, rej) => {
+        db()
+            .collection('jobs')
+            .find({})
+            .toArray((err, docs) => {
+                err ? rej(err) : res(docs)
+            })
         })
 })
 

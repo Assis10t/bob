@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <script>
+            function updateDatabase() {
+                console.log("Button is pressed!")
+                var url = "http://localhost:9000/jobs";
+                var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+                xmlhttp.onreadystatechange = function () {
+                    if(xmlhttp.readyState === 4) {
+                        console.log(xmlhttp.responseText);
+                    }
+                };
+                xmlhttp.open("POST", url);
+                xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xmlhttp.send(JSON.stringify({"move":"true"}));
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Activate Bob!</h1>
+        <button onclick="updateDatabase()">Activate!</button>
+    </body>
+</html>

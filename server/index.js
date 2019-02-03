@@ -14,6 +14,8 @@ const app = express()
 
 app.use(bodyParser.json())
 
+app.use(express.static('public'))
+
 //Logs all requests.
 app.use((req, res, next) => {
     console.log(`${req.ip}: ${req.method} ${req.originalUrl}`)
@@ -49,6 +51,22 @@ app.post('/order', (req, res, next) => {
     model
         .addOrder(req.body)
         .then(order => res.json({ success: true, order }))
+        .catch(next)
+})
+
+app.post('/jobs', (req, res, next) => {
+    model
+        .addJob(req.body)
+        .then(job => res.json({success: true, job}))
+        .catch(next)
+})
+app.get('/jobs', (req,res,next) => {
+    model
+        .getAllJobs(req.body)
+        .then(jobs => {
+            if (jobs) res.json({success:true, jobs})
+            else res.status(404).json({success:true, jobs:null})
+        })
         .catch(next)
 })
 
