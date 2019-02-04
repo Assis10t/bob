@@ -11,7 +11,7 @@ class ServerConnection {
 
     companion object {
         private val TAG = "ServerConnection"
-        val SERVER_NAME = "My Web Server"
+        val SERVER_NAME = "assis10t"
         var serverIp: String? = null
 
         val onConnectedListeners: MutableList<(String) -> Unit> = mutableListOf()
