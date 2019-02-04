@@ -20,13 +20,18 @@ const factory = db => ({
                     err ? rej(err) : res(docs[0])
                 })
         }),
-
     addOrder: orderData =>
         new Promise((res, rej) => {
             db()
                 .collection('orders')
                 .insertOne(orderData, (err, order) => {
-                    err ? rej(err) : res(orderData)
+                    if (err) {
+                        rej(err)
+                        return
+                    }
+                    Promise.all(orderData.items.map(i => factory(db).removeItem(i)))
+                        .then(() => res(orderData))
+                        .catch(err => rej(err))
                 })
         }),
     addJob: jobData =>
@@ -77,6 +82,14 @@ const factory = db => ({
             db()
                 .collection('inventory')
                 .insertOne({ _id: new ObjectID(), ...item }, (err, item) => {
+                    err ? rej(err) : res(item)
+                })
+        }),
+    removeItem: item =>
+        new Promise((res, rej) => {
+            db()
+                .collection('inventory')
+                .deleteOne({ _id: new ObjectID(item._id) }, (err, item) => {
                     err ? rej(err) : res(item)
                 })
         }),
