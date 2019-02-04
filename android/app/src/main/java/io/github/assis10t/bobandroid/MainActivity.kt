@@ -22,11 +22,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         container.isRefreshing = true
-        container.isEnabled = true
-
+        container.setOnRefreshListener { refreshItems() }
         ServerConnection().connect {
             container.isRefreshing = false
-            container.isEnabled = false
         }
         item_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         item_list.adapter = ItemAdapter()
@@ -39,7 +37,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun refreshItems() {
+        container.isRefreshing = true
         ServerConnection().getItems { success, items ->
+            container.isRefreshing = false
             if (!success) {
                 Timber.e("getItems failed.")
                 return@getItems
