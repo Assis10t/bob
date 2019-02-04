@@ -13,7 +13,7 @@ class FollowLine:
     KI = 0  # integral gain       lowest
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
-    MARKING_NUMBER = 5 # number of consecutive colour readings to detect marking
+    MARKING_NUMBER = 2 # number of consecutive colour readings to detect marking
 
     # Constructor
     def __init__(self):
@@ -44,6 +44,7 @@ class FollowLine:
         colour = self.csb.value()
         if colour == 3:  # green
             self.colour_counter += 1
+            print("COLOUR COUNTER: ", self.colour_counter)
             if self.colour_counter > self.MARKING_NUMBER:
                 return True
         else:
@@ -107,6 +108,7 @@ class FollowLine:
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
+        ev3.Sound.speak("yeet").wait()
 
     def start(self):
         self.shut_down = False
@@ -117,5 +119,3 @@ class FollowLine:
 if __name__ == "__main__":
     robot = FollowLine()
     robot.start()
-    sleep(5)
-    robot.stop()
