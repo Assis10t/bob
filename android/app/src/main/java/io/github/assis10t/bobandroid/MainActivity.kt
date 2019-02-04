@@ -1,8 +1,5 @@
 package io.github.assis10t.bobandroid
 
-import android.content.Context
-import android.net.nsd.NsdManager
-import android.net.nsd.NsdServiceInfo
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.CardView
@@ -15,7 +12,6 @@ import android.widget.TextView
 import io.github.assis10t.bobandroid.pojo.Item
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
-import java.net.InetAddress
 
 class MainActivity : AppCompatActivity() {
 
@@ -68,12 +64,12 @@ class MainActivity : AppCompatActivity() {
             val item = itemList[pos]
             val context = vh.container.context
             vh.title.text = item.name
-//            vh.container.setCardBackgroundColor(
-//                if (selectedItems.contains(item))
-//                    vh.container.context.getColor(R.color.lightGray)
-//                else
-//                    vh.container.context.getColor(R.color.white)
-//            )
+            vh.container.setCardBackgroundColor(
+                if (selectedItems.contains(item))
+                    vh.container.context.getColor(R.color.selectHighlight)
+                else
+                    vh.container.context.getColor(R.color.white)
+            )
             vh.container.cardElevation =
                     if (selectedItems.contains(item))
                         dp(context, 4f)

@@ -1,6 +1,5 @@
 package io.github.assis10t.bobandroid
 
-import android.os.AsyncTask
 import com.google.gson.Gson
 import io.github.assis10t.bobandroid.pojo.GetItemsResponse
 import io.github.assis10t.bobandroid.pojo.Item
@@ -10,7 +9,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import timber.log.Timber
 import java.io.IOException
-import java.net.Inet4Address
+import java.util.concurrent.TimeUnit
 import javax.jmdns.JmDNS
 import javax.jmdns.ServiceEvent
 import javax.jmdns.ServiceListener
@@ -18,9 +17,10 @@ import javax.jmdns.ServiceListener
 class ServerConnection {
     companion object {
         val SERVER_NAME = "assis10t"
-        var serverIp: String? = null
+        var serverAddress: String? = null
+        val httpClient: OkHttpClient = OkHttpClient()
 
-        val onConnectedListeners: MutableList<(serverIp: String) -> Unit> = mutableListOf()
+        val onConnectedListeners: MutableList<(serverAddress: String) -> Unit> = mutableListOf()
 
         fun initialize() {
             doAsync {
@@ -33,8 +33,8 @@ class ServerConnection {
                         Timber.d("Service resolved: $info")
                         if (info.name.contains(SERVER_NAME)) {
                             uiThread {
-                                serverIp = "${info.inet4Addresses[0]!!.hostAddress}:${info.port}"
-                                onConnectedListeners.forEach { it(serverIp!!) }
+                                serverAddress = "http://${info.inet4Addresses[0]!!.hostAddress}:${info.port}"
+                                onConnectedListeners.forEach { it(serverAddress!!) }
                                 onConnectedListeners.clear()
                             }
                         }
@@ -57,8 +57,8 @@ class ServerConnection {
     }
 
     fun connect(onConnected: (String) -> Unit) {
-        if (serverIp != null)
-            onConnected(serverIp!!)
+        if (serverAddress != null)
+            onConnected(serverAddress!!)
         else
             onConnectedListeners.add(onConnected)
     }
@@ -67,9 +67,10 @@ class ServerConnection {
         { url: String, onGetComplete: (success: Boolean, response: String?) -> Unit ->
             doAsync {
                 Timber.d("Get request to $url")
-                val request = Request.Builder().url(url).build()
                 try {
+                    val request = Request.Builder().url(url).build()
                     val response = http.newCall(request).execute()
+                    Timber.d("Response received.")
                     if (!response.isSuccessful) {
                         Timber.e("Get Request failed: (${response.code()}) ${response.body().toString()}")
                         uiThread { onGetComplete(false, null) }
@@ -88,6 +89,7 @@ class ServerConnection {
         { onGetItems: (success: Boolean, items: List<Item>?) -> Unit ->
             connect { serverIp ->
                 getRequestFactory(http)("$serverIp/items") { success, str ->
+                    Timber.d("Result: $success, response: $str")
                     if (!success) {
                         onGetItems(success, null)
                     }
@@ -99,5 +101,5 @@ class ServerConnection {
             }
         }
     }
-    val getItems = getItemsFactory(OkHttpClient(), Gson())
+    val getItems = getItemsFactory(httpClient, Gson())
 }

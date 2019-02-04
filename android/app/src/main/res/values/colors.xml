@@ -4,6 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="white">#FFFFFF</color>
-    <color name="lightGray">#CDCDCD</color>
+    <color name="selectHighlight">#E0F2F1</color>
     <color name="fadedBackground">#33000000</color>
 </resources>
