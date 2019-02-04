@@ -85,5 +85,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}.`)
-  bonjour.publish({ name: 'My Web Server', type: 'http', port: PORT })
+  bonjour.publish({ name: 'assis10t', type: 'http', port: PORT })
 })
