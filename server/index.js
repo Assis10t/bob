@@ -71,6 +71,20 @@ app.get('/jobs', (req, res, next) => {
         .catch(next)
 })
 
+app.get('/turnon', (req,res,next) => {
+    model
+        .turnOn()
+        .then(count => res.json({success: true, count}))
+        .catch(next)
+})
+app.get('/turnoff', (req,res,next) => {
+    model
+        .turnOff()
+        .then(off => res.json({success: true, off}))
+        .catch(next)
+})
+
+
 //Logs all responses.
 app.use((req, res, next) => {
     console.log(`${req.ip}: ${req.method} ${req.originalUrl} response: ${res.body}`)
@@ -85,6 +99,7 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}.`)
-    bonjour.publish({ name: 'assis10t', type: 'http', host: utils.getIp(), port: PORT })
+  console.log(`Listening on port ${PORT}.`)
+
 })
+bonjour.publish({ name: 'assis10t', type: 'http', port: PORT })
