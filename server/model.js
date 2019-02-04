@@ -70,6 +70,24 @@ const factory = db => ({
                 .toArray((err, docs) => {
                     err ? rej(err) : res(docs[0])
                 })
+        }),
+
+    addItem: item =>
+        new Promise((res, rej) => {
+            db()
+                .collection('inventory')
+                .insertOne({ _id: new ObjectID(), ...item }, (err, item) => {
+                    err ? rej(err) : res(item)
+                })
+        }),
+    getItems: () =>
+        new Promise((res, rej) => {
+            db()
+                .collection('inventory')
+                .find({})
+                .toArray((err, items) => {
+                    err ? rej(err) : res(items)
+                })
         })
 })
 
