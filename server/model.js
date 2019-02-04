@@ -50,27 +50,28 @@ const factory = db => ({
         new Promise((res,rej) => {
             db()
                 .collection('bob_movement')
-                .update({"_id":"movement"}, {"moving":true}, (err, count_modified) => {
-                    err ? rej(err) : res(count_modified)
+                .updateOne({"_id":"movement"}, {"$set":{"moving":true}}, (err, count_modified) => {
+                    err ? rej(err) : res('on')
                 })
             }),
     turnOff: () =>
     new Promise((res,rej) => {
         db()
             .collection('bob_movement')
-            .update({"_id":"movement"}, {"moving":false}, (err, count_modified) => {
-                err ? rej(err) : res(count_modified)
+            .updateOne({"_id":"movement"}, {"$set":{"moving":false}}, (err, count_modified) => {
+                err ? rej(err) : res('off')
             })
         }),
-    setUpOn: () =>
-        new Promise((res,rej) => {
+    getMovement: () =>
+        new Promise((res, rej) => {
             db()
                 .collection('bob_movement')
-                .insertOne({"_id":"movement",'moving':false}, (err, move) => {
-                    err ? rej(err) : res(move)
+                .find({})
+                .toArray((err,docs) => {
+                    err ? rej(err) : res(docs[0])
                 })
-                
         })
+    
 })
 
 module.exports = factory(db)

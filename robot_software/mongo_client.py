@@ -22,34 +22,42 @@ import sys
 print("sys imported")
 import datetime
 print("datetime imported")
+import json
+print("json imported")
 from threading import Thread
 print("threading imported")
 from zeroconf import ServiceBrowser, Zeroconf
 print("zeroconf imported")
+#remove me
+import traceback
 
 last_json = {}
 
 def polling(ip_addr, port, run_robot):
-    r = requests.get("http://{}:{}/jobs".format(ip_addr,port))
-    last_json = r.text
     running = True
+    movement = False
     while running:
         try:
-            r = requests.get("http://{}:{}/jobs".format(ip_addr,port))
-            if (r.text != last_json):
+            r = requests.get("http://{}:{}/getmovement".format(ip_addr,port))
+            robot = json.loads(r.text)['status']
+            if (robot['moving'] == True and movement == False):
                 #fire motors
-                print("JSON CHANGED!")
+                print("Turned on!")
                 if (run_robot):
                     ev3.Sound.speak("i am bob bot. Beep, i collect your shopping")
                     robot = FollowLine()
                     robot.run()
                     # TODO: Find out a way to halt this call
-                    # so we can start and stop the robot
-                running = False
-                continue
+                    # so we can start and stop the robot         
+            elif(robot['moving'] == False and movement == True):
+                #robot.stop()
+                print("Turned Off!")
+            movement = robot['moving']
         except:
-            url = "http://{}:{}/jobs".format(ip_addr,port)
+            url = "http://{}:{}/getmovement".format(ip_addr,port)
             print("GET request: {} failed at {}".format(url,datetime.datetime.now()))
+            traceback.print_exc()
+
         time.sleep(2)
 
 class MyListener:
@@ -112,7 +120,8 @@ if __name__ == "__main__":
         else:
             print("Unable to start client as ev3 package not present and test mode not indicated")
             exit()
-    ev3.Sound.beep().wait()
+    if (run_robot):
+        ev3.Sound.beep().wait()
     zeroconf = Zeroconf()
     listener = MyListener(run_robot)
     browser = ServiceBrowser(zeroconf, "_http._tcp.local.", listener)

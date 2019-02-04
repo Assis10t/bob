@@ -71,19 +71,24 @@ app.get('/jobs', (req, res, next) => {
         .catch(next)
 })
 
-app.get('/turnon', (req,res,next) => {
+app.put('/turnon', (req,res,next) => {
     model
         .turnOn()
-        .then(count => res.json({success: true, count}))
+        .then(on => res.json({success: true, on}))
         .catch(next)
 })
-app.get('/turnoff', (req,res,next) => {
+app.put('/turnoff', (req,res,next) => {
     model
         .turnOff()
         .then(off => res.json({success: true, off}))
         .catch(next)
 })
-
+app.get('/getmovement', (req,res,next) => {
+    model
+        .getMovement()
+        .then(status => res.json({success:true, status}))
+        .catch(next)
+})
 
 //Logs all responses.
 app.use((req, res, next) => {
@@ -100,6 +105,6 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}.`)
-
+  
 })
 bonjour.publish({ name: 'assis10t', type: 'http', port: PORT })
