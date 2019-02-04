@@ -2,6 +2,7 @@
 import ev3dev.ev3 as ev3
 import logging
 from time import sleep
+from threading import Thread
 
 
 class FollowLine:
@@ -10,7 +11,9 @@ class FollowLine:
     KP = 20
     KD = 0.1  # derivative gain   medium
     KI = 0  # integral gain       lowest
-    DT = 50  # milliseconds  -  represents change in time since last sensor reading/movement
+    DT = 50  # milliseconds  -  represents change in time since last sensor reading/
+
+    MARKING_NUMBER = 5 # number of consecutive colour readings to detect marking
 
     # Constructor
     def __init__(self):
@@ -33,10 +36,19 @@ class FollowLine:
         assert self.lm.connected
         assert self.rm.connected
 
-    def detect_marking(self, sensor):
-        colour = sensor.value()
-        if (colour == 3): #green
-            print('yeet')
+        self.colour_counter = 0
+
+        self.runner = None
+
+    def detect_marking(self):
+        colour = self.csb.value()
+        if colour == 3:  # green
+            self.colour_counter += 1
+            if self.colour_counter > self.MARKING_NUMBER:
+                return True
+        else:
+            self.colour_counter = 0
+        return False
 
     @staticmethod
     def on_line(sensor_value, position):
@@ -84,16 +96,26 @@ class FollowLine:
 
             previous_error = error
 
+            if self.detect_marking():
+                self.stop()
+
     def run(self):
         self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm)
         self.stop()
 
     def stop(self):
+        self.shut_down = True
         self.rm.stop()
         self.lm.stop()
 
+    def start(self):
+        self.shut_down = False
+        self.runner = Thread(target=self.run, name='move')
+        self.runner.start()
 
 # Main function
 if __name__ == "__main__":
     robot = FollowLine()
-    robot.run()
+    robot.start()
+    sleep(5)
+    robot.stop()
