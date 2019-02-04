@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 import ev3dev.ev3 as ev3
 import logging
-from time import sleep
+from time import sleep, time
 from threading import Thread
 
 
@@ -13,7 +13,7 @@ class FollowLine:
     KI = 0  # integral gain       lowest
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
-    MARKING_NUMBER = 2 # number of consecutive colour readings to detect marking
+    MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
 
     # Constructor
     def __init__(self):
@@ -36,19 +36,20 @@ class FollowLine:
         assert self.lm.connected
         assert self.rm.connected
 
-        self.colour_counter = 0
+        self.consecutive_colours = 0  # counter for consecutive colour readings
+
 
         self.runner = None
 
     def detect_marking(self):
         colour = self.csb.value()
         if colour == 3:  # green
-            self.colour_counter += 1
-            print("COLOUR COUNTER: ", self.colour_counter)
-            if self.colour_counter > self.MARKING_NUMBER:
+            self.consecutive_colours += 1
+            print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
+            if self.consecutive_colours > self.MARKING_NUMBER:
                 return True
         else:
-            self.colour_counter = 0
+            self.consecutive_colours = 0
         return False
 
     @staticmethod
@@ -60,10 +61,12 @@ class FollowLine:
         logging.error("onLine: wrong position value for sensor")
         return False
 
-    def correct_trajectory(self, csfl, csfr, lm, rm):
+    def correct_trajectory(self, csfl, csfr, lm, rm, number_of_markers):
         integral = 0
         previous_error = 0
-
+        marker_counter = 0
+        start_time = 0
+        interval_between_colors = 2 # time between marker checks in seconds
         while not self.shut_down:
             lval = csfl.value()
             rval = csfr.value()
@@ -97,11 +100,16 @@ class FollowLine:
 
             previous_error = error
 
-            if self.detect_marking():
-                self.stop()
+            #Check markers
+            if (time() - start_time > interval_between_colors):
+                if self.detect_marking():
+                    marker_counter += 1
+                    start_time = time()
+                    if (marker_counter >= number_of_markers):
+                        self.stop()
 
-    def run(self):
-        self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm)
+    def run(self, number_of_markers):
+        self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm,number_of_markers)
         self.stop()
 
     def stop(self):
@@ -110,12 +118,13 @@ class FollowLine:
         self.lm.stop()
         ev3.Sound.speak("yeet").wait()
 
-    def start(self):
+    def start(self,number_of_markers):
         self.shut_down = False
-        self.runner = Thread(target=self.run, name='move')
+        self.runner = Thread(target=self.run, name='move', args=(number_of_markers,))
         self.runner.start()
+
 
 # Main function
 if __name__ == "__main__":
     robot = FollowLine()
-    robot.start()
+    robot.start(3)
