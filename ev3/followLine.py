@@ -17,6 +17,27 @@ class FollowLine:
         self.btn = ev3.Button()
         self.shut_down = False
 
+        # colour sensors
+        self.csfl = ev3.ColorSensor('in1')  # colour sensor front left
+        self.csfr = ev3.ColorSensor('in2')  # colour sensor front right
+        self.csb = ev3.ColorSensor('in3')  # colour sensor back
+        assert self.csfl.connected
+        assert self.csfr.connected
+        self.csfl.mode = 'COL-REFLECT'  # measure light intensity
+        self.csfr.mode = 'COL-REFLECT'  # measure light intensity
+        self.csb.mode = 'COL-COLOR'  # measure colour
+
+        # motors
+        self.lm = ev3.LargeMotor('outA')  # left motor
+        self.rm = ev3.LargeMotor('outC')  # right motor
+        assert self.lm.connected
+        assert self.rm.connected
+
+    def detect_marking(self, sensor):
+        colour = sensor.value()
+        if (colour == 3): #green
+            print('yeet')
+
     @staticmethod
     def on_line(sensor_value, position):
         if position == 'left':
@@ -64,24 +85,12 @@ class FollowLine:
             previous_error = error
 
     def run(self):
+        self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm)
+        self.stop()
 
-        # colour sensors
-        csfl = ev3.ColorSensor('in1')  # colour sensor front left
-        csfr = ev3.ColorSensor('in2')  # colour sensor front right
-        assert csfl.connected
-        assert csfr.connected
-        csfl.mode = 'COL-REFLECT'  # measure light intensity
-        csfr.mode = 'COL-REFLECT'  # measure light intensity
-
-        # motors
-        lm = ev3.LargeMotor('outA')  # left motor
-        rm = ev3.LargeMotor('outC')  # right motor
-        assert lm.connected
-        assert rm.connected
-        self.correct_trajectory(csfl, csfr, lm, rm)
-
-        rm.stop()
-        lm.stop()
+    def stop(self):
+        self.rm.stop()
+        self.lm.stop()
 
 
 # Main function
