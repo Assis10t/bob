@@ -29,47 +29,63 @@ const factory = db => ({
                     err ? rej(err) : res(orderData)
                 })
         }),
-    addJob: jobData => 
+    addJob: jobData =>
         new Promise((res, rej) => {
             db()
                 .collection('jobs')
-                .insertOne(jobData, (err,job) => {
+                .insertOne(jobData, (err, job) => {
                     err ? rej(err) : res(jobData)
                 })
         }),
     getAllJobs: () =>
-    new Promise((res, rej) => {
-        db()
-            .collection('jobs')
-            .find({})
-            .toArray((err, docs) => {
-                err ? rej(err) : res(docs)
-            })
+        new Promise((res, rej) => {
+            db()
+                .collection('jobs')
+                .find({})
+                .toArray((err, docs) => {
+                    err ? rej(err) : res(docs)
+                })
         }),
     turnOn: () =>
-        new Promise((res,rej) => {
+        new Promise((res, rej) => {
             db()
                 .collection('bob_movement')
-                .update({"_id":"movement"}, {"moving":true}, (err, count_modified) => {
+                .update({ _id: 'movement' }, { moving: true }, (err, count_modified) => {
                     err ? rej(err) : res(count_modified)
                 })
-            }),
-    turnOff: () =>
-    new Promise((res,rej) => {
-        db()
-            .collection('bob_movement')
-            .update({"_id":"movement"}, {"moving":false}, (err, count_modified) => {
-                err ? rej(err) : res(count_modified)
-            })
         }),
-    setUpOn: () =>
-        new Promise((res,rej) => {
+    turnOff: () =>
+        new Promise((res, rej) => {
             db()
                 .collection('bob_movement')
-                .insertOne({"_id":"movement",'moving':false}, (err, move) => {
+                .update({ _id: 'movement' }, { moving: false }, (err, count_modified) => {
+                    err ? rej(err) : res(count_modified)
+                })
+        }),
+    setUpOn: () =>
+        new Promise((res, rej) => {
+            db()
+                .collection('bob_movement')
+                .insertOne({ _id: 'movement', moving: false }, (err, move) => {
                     err ? rej(err) : res(move)
                 })
-                
+        }),
+    addItem: item =>
+        new Promise((res, rej) => {
+            db()
+                .collection('inventory')
+                .insertOne({ _id: new ObjectID(), ...item }, (err, item) => {
+                    err ? rej(err) : res(item)
+                })
+        }),
+    getItems: () =>
+        new Promise((res, rej) => {
+            db()
+                .collection('inventory')
+                .find({})
+                .toArray((err, items) => {
+                    err ? rej(err) : res(items)
+                })
         })
 })
 

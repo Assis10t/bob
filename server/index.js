@@ -71,6 +71,23 @@ app.get('/jobs', (req, res, next) => {
         .catch(next)
 })
 
+app.get('/items', (req, res, next) => {
+    model
+        .getItems()
+        .then(items => {
+            if (items) res.json({ success: true, items })
+            else res.status(404).json({ success: true, items: null })
+        })
+        .catch(next)
+})
+
+app.post('/items', (req, res, next) => {
+    model
+        .addItem(req.body)
+        .then(item => res.json({ success: true, item }))
+        .catch(next)
+})
+
 app.get('/turnon', (req, res, next) => {
     model
         .turnOn()
