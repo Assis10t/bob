@@ -10,7 +10,6 @@ class FollowLine:
     KP = 20
     KD = 0.1  # derivative gain   medium
     KI = 0  # integral gain       lowest
-
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/movement
 
     # Constructor
@@ -18,7 +17,8 @@ class FollowLine:
         self.btn = ev3.Button()
         self.shut_down = False
 
-    def onLine(self, sensor_value, position):
+    @staticmethod
+    def on_line(sensor_value, position):
         if position == 'left':
             return sensor_value < 30
         if position == 'right':
@@ -26,7 +26,7 @@ class FollowLine:
         logging.error("onLine: wrong position value for sensor")
         return False
 
-    def correctTrajectory(self, csfl, csfr, lm, rm):
+    def correct_trajectory(self, csfl, csfr, lm, rm):
         integral = 0
         previous_error = 0
 
@@ -42,7 +42,7 @@ class FollowLine:
             # u positive: too bright, turn right
             # u negative: too dark,   turn left
             # u is torque (See IVR lecture on Control)
-            u = (self.KP * error) + (self.KI * integral) + (self.KD* derivative)
+            u = (self.KP * error) + (self.KI * integral) + (self.KD * derivative)
 
             # limit u to safe values: [-1000, 1000] deg/sec
             if self.MOTOR_SPEED + abs(u) > 1000:  # reduce u if speed and torque are too high
@@ -55,7 +55,6 @@ class FollowLine:
             lm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED + u))
             rm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED - u))
             sleep(self.DT / 1000)
-
 
             print("u {}".format(u))
             print("lm {}\n".format(lm.speed_sp))
@@ -79,19 +78,8 @@ class FollowLine:
         rm = ev3.LargeMotor('outC')  # right motor
         assert lm.connected
         assert rm.connected
-        self.correctTrajectory(csfl, csfr, lm, rm)
+        self.correct_trajectory(csfl, csfr, lm, rm)
 
-        """
-
-        lm.run_forever(speed_sp=-self.MOTOR_SPEED)
-        rm.run_forever(speed_sp=-self.MOTOR_SPEED)
-        while not self.shut_down:
-            print(csfl.value(), csfr.value())
-            if self.onLine(csfl.value(), 'left') or self.onLine(csfr.value(), 'right'):   # left sensor is on the line
-                lm.stop()
-                rm.stop()
-                self.correctTrajectory(csfl, csfr, lm, rm)
-        """
         rm.stop()
         lm.stop()
 
