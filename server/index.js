@@ -3,6 +3,7 @@ const express = require('express')
 const db = require('./db')
 const model = require('./model')
 const bonjour = require('bonjour')()
+const utils = require('./utils')
 
 const PORT = process.env.PORT || 9000
 
@@ -22,8 +23,8 @@ app.use((req, res, next) => {
     next()
 })
 
-app.get('/ping',(req,res) => {
-  res.send("pong")
+app.get('/ping', (req, res) => {
+    res.send('pong')
 })
 app.get('/order', (req, res, next) =>
     model
@@ -57,15 +58,15 @@ app.post('/order', (req, res, next) => {
 app.post('/jobs', (req, res, next) => {
     model
         .addJob(req.body)
-        .then(job => res.json({success: true, job}))
+        .then(job => res.json({ success: true, job }))
         .catch(next)
 })
-app.get('/jobs', (req,res,next) => {
+app.get('/jobs', (req, res, next) => {
     model
         .getAllJobs(req.body)
         .then(jobs => {
-            if (jobs) res.json({success:true, jobs})
-            else res.status(404).json({success:true, jobs:null})
+            if (jobs) res.json({ success: true, jobs })
+            else res.status(404).json({ success: true, jobs: null })
         })
         .catch(next)
 })
@@ -84,6 +85,6 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}.`)
-  bonjour.publish({ name: 'My Web Server', type: 'http', port: PORT })
+    console.log(`Listening on port ${PORT}.`)
+    bonjour.publish({ name: 'My Web Server', type: 'http', host: utils.getIp(), port: PORT })
 })
