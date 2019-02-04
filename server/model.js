@@ -45,6 +45,31 @@ const factory = db => ({
             .toArray((err, docs) => {
                 err ? rej(err) : res(docs)
             })
+        }),
+    turnOn: () =>
+        new Promise((res,rej) => {
+            db()
+                .collection('bob_movement')
+                .update({"_id":"movement"}, {"moving":true}, (err, count_modified) => {
+                    err ? rej(err) : res(count_modified)
+                })
+            }),
+    turnOff: () =>
+    new Promise((res,rej) => {
+        db()
+            .collection('bob_movement')
+            .update({"_id":"movement"}, {"moving":false}, (err, count_modified) => {
+                err ? rej(err) : res(count_modified)
+            })
+        }),
+    setUpOn: () =>
+        new Promise((res,rej) => {
+            db()
+                .collection('bob_movement')
+                .insertOne({"_id":"movement",'moving':false}, (err, move) => {
+                    err ? rej(err) : res(move)
+                })
+                
         })
 })
 
