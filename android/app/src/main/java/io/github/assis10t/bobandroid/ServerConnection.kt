@@ -3,8 +3,11 @@ package io.github.assis10t.bobandroid
 import com.google.gson.Gson
 import io.github.assis10t.bobandroid.pojo.GetItemsResponse
 import io.github.assis10t.bobandroid.pojo.Item
+import io.github.assis10t.bobandroid.pojo.Order
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import timber.log.Timber
@@ -85,15 +88,38 @@ class ServerConnection {
         }
     }
 
+    val postRequestFactory = { http: OkHttpClient, gson: Gson ->
+        { url: String, body: Any, onPostComplete: (success: Boolean, response: String?) -> Unit ->
+            doAsync {
+                Timber.d("Post request to $url")
+                try {
+                    val JSON = MediaType.get("application/json; charset=utf-8")
+                    val requestBody = RequestBody.create(JSON, gson.toJson(body))
+                    val request = Request.Builder().url(url).post(requestBody).build()
+                    val response = http.newCall(request).execute()
+                    Timber.d("Response received.")
+                    if (!response.isSuccessful) {
+                        Timber.e("Post Request failed: (${response.code()}) ${response.body().toString()}")
+                        uiThread { onPostComplete(false, null) }
+                    } else {
+                        uiThread { onPostComplete(true, response.body()?.string()) }
+                    }
+                } catch (e: IOException) {
+                    Timber.e(e, "Post Request failed")
+                    uiThread { onPostComplete(false, null) }
+                }
+            }
+        }
+    }
+
     val getItemsFactory = { http: OkHttpClient, gson: Gson ->
         { onGetItems: (success: Boolean, items: List<Item>?) -> Unit ->
-            connect { serverIp ->
-                getRequestFactory(http)("$serverIp/items") { success, str ->
+            connect { server ->
+                getRequestFactory(http)("$server/items") { success, str ->
                     Timber.d("Result: $success, response: $str")
                     if (!success) {
                         onGetItems(success, null)
-                    }
-                    else {
+                    } else {
                         val response = gson.fromJson(str!!, GetItemsResponse::class.java)
                         onGetItems(response.success, response.items)
                     }
@@ -102,4 +128,21 @@ class ServerConnection {
         }
     }
     val getItems = getItemsFactory(httpClient, Gson())
+
+    val makeOrderFactory = { http: OkHttpClient, gson: Gson ->
+        { order: Order, onOrderComplete: ((success: Boolean) -> Unit)? ->
+            connect { server ->
+                postRequestFactory(http, gson)("$server/order", order) { success, str ->
+                    Timber.d("Result: $success, response: $str")
+                    if (!success) {
+                        onOrderComplete?.invoke(success)
+                    } else {
+                        val response = gson.fromJson(str!!, GetItemsResponse::class.java)
+                        onOrderComplete?.invoke(response.success)
+                    }
+                }
+            }
+        }
+    }
+    val makeOrder = makeOrderFactory(httpClient, Gson())
 }

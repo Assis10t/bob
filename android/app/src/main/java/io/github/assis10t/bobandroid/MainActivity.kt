@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import io.github.assis10t.bobandroid.pojo.Item
+import io.github.assis10t.bobandroid.pojo.Order
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 
@@ -27,11 +28,27 @@ class MainActivity : AppCompatActivity() {
             container.isRefreshing = false
         }
         item_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        item_list.adapter = ItemAdapter()
+        item_list.adapter = ItemAdapter { selected ->
+            if (selected.isEmpty())
+                make_order.hide()
+            else
+                make_order.show()
+        }
 
-        //TODO: Remove the next 2 lines
-//        val adapter = item_list.adapter as ItemAdapter
-//        adapter.updateItems(listOf(Item(null, "Apple"), Item(null, "Orange"), Item(null, "Yeet")))
+        //make_order.hide()
+        make_order.setOnClickListener {
+            container.isRefreshing = true
+            make_order.hide()
+            val adapter = item_list.adapter as ItemAdapter
+            ServerConnection().makeOrder(Order(null, adapter.selectedItems)) { success ->
+                if (!success)
+                    Timber.e("Could not make order.")
+                else {
+                    Timber.d("Order made.")
+                    refreshItems()
+                }
+            }
+        }
 
         refreshItems()
     }
@@ -50,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    class ItemAdapter: RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
+    class ItemAdapter(var onSelectionChanged: (selected: List<Item>) -> Unit): RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
         var itemList: List<Item> = listOf()
         val selectedItems: MutableList<Item> = mutableListOf()
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -80,6 +97,7 @@ class MainActivity : AppCompatActivity() {
                     selectedItems.remove(item)
                 else
                     selectedItems.add(item)
+                onSelectionChanged(itemList)
                 notifyItemChanged(pos)
             }
         }
