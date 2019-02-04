@@ -12,18 +12,22 @@ class ServerConnection {
     companion object {
         private val TAG = "ServerConnection"
         val SERVER_NAME = "My Web Server"
+        var serverIp: String? = null
 
-        class ConnectTask(val onJmDNSCreated: (JmDNS) -> Unit, val onConnected: (Inet4Address, Int) -> Unit): AsyncTask<Unit, JmDNS, Unit>() {
+        val onConnectedListeners: MutableList<(String) -> Unit> = mutableListOf()
+
+        class ConnectTask: AsyncTask<Unit, JmDNS, Unit>() {
             override fun doInBackground(vararg params: Unit?) {
                 Log.d(TAG, "Discovery started")
                 val mJmDNS = JmDNS.create()
-                publishProgress(mJmDNS)
                 mJmDNS.addServiceListener("_http._tcp.local.", object : ServiceListener {
                     override fun serviceResolved(event: ServiceEvent?) {
                         val info = mJmDNS.getServiceInfo(event!!.type, event.name)
                         Log.d(TAG, "Service resolved: $info")
                         if (info.name.contains(SERVER_NAME)) {
-                            onConnected(info.inet4Addresses[0], info.port)
+                            serverIp = "${info.inet4Addresses[0]!!.hostAddress}:${info.port}"
+                            onConnectedListeners.forEach { it(serverIp!!) }
+                            onConnectedListeners.clear()
                         }
                     }
 
@@ -38,14 +42,19 @@ class ServerConnection {
                 })
             }
         }
+
+        fun initialize() {
+            ConnectTask().execute()
+            ServerConnection().connect { ip ->
+                Log.d(TAG, "Server found at $ip")
+            }
+        }
     }
 
-    private var mJmDNS: JmDNS? = null
-
-    fun connect() {
-        val connectTask = ConnectTask({mJmDNS = it}) { addr, port ->
-            Log.d(TAG, "Server found at ${addr.hostAddress}:$port")
-        }
-        connectTask.execute()
+    fun connect(onConnected: (String) -> Unit) {
+        if (serverIp != null)
+            onConnected(serverIp!!)
+        else
+            onConnectedListeners.add(onConnected)
     }
 }
