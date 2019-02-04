@@ -50,41 +50,25 @@ const factory = db => ({
         new Promise((res, rej) => {
             db()
                 .collection('bob_movement')
-                .update({ _id: 'movement' }, { moving: true }, (err, count_modified) => {
-                    err ? rej(err) : res(count_modified)
+                .updateOne({ _id: 'movement' }, { $set: { moving: true } }, (err, count_modified) => {
+                    err ? rej(err) : res('on')
                 })
         }),
     turnOff: () =>
         new Promise((res, rej) => {
             db()
                 .collection('bob_movement')
-                .update({ _id: 'movement' }, { moving: false }, (err, count_modified) => {
-                    err ? rej(err) : res(count_modified)
+                .updateOne({ _id: 'movement' }, { $set: { moving: false } }, (err, count_modified) => {
+                    err ? rej(err) : res('off')
                 })
         }),
-    setUpOn: () =>
+    getMovement: () =>
         new Promise((res, rej) => {
             db()
                 .collection('bob_movement')
-                .insertOne({ _id: 'movement', moving: false }, (err, move) => {
-                    err ? rej(err) : res(move)
-                })
-        }),
-    addItem: item =>
-        new Promise((res, rej) => {
-            db()
-                .collection('inventory')
-                .insertOne({ _id: new ObjectID(), ...item }, (err, item) => {
-                    err ? rej(err) : res(item)
-                })
-        }),
-    getItems: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('inventory')
                 .find({})
-                .toArray((err, items) => {
-                    err ? rej(err) : res(items)
+                .toArray((err, docs) => {
+                    err ? rej(err) : res(docs[0])
                 })
         })
 })

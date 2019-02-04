@@ -1,47 +1,67 @@
 #!/usr/bin/python3
 
 #check that the robot packages are present
+print("Starting Client")
 ev3_package_check = True
 try:
     import ev3dev.ev3 as ev3
-    from follow import FollowLine
+    from followLine import FollowLine
+    print("ev3 modules imported")
 except:
     print("Unable to load robot control packages package!")
     ev3_package_check = False
-
 import requests
+print("request imported")
 import socket
+print("socket imported")
 import struct
+print("struct imported")
 import time
+print("time imported")
 import sys
+print("sys imported")
 import datetime
+print("datetime imported")
+import json
+print("json imported")
 from threading import Thread
+print("threading imported")
 from zeroconf import ServiceBrowser, Zeroconf
-
+print("zeroconf imported")
+#remove me
+import traceback
 
 last_json = {}
 
 def polling(ip_addr, port, run_robot):
-    r = requests.get("http://{}:{}/jobs".format(ip_addr,port))
-    last_json = r.text
     running = True
+    movement = False
+    if run_robot:
+        bob_bot = FollowLine()
     while running:
         try:
-            r = requests.get("http://{}:{}/jobs".format(ip_addr,port))
-            if (r.text != last_json):
+            r = requests.get("http://{}:{}/getmovement".format(ip_addr,port))
+            robot = json.loads(r.text)['status']
+            if (robot['moving'] == True and movement == False):
                 #fire motors
-                print("JSON CHANGED!")
+                print("Turned on!")
                 if (run_robot):
-                    robot = FollowLine()
-                    robot.run()
-                    # TODO: Find out a way to halt this call 
+
+                    bob_bot.start()
+                    # TODO: Find out a way to halt this call
                     # so we can start and stop the robot
-                running = False
-                continue
-        except: 
-            url = "http://{}:{}/jobs".format(ip_addr,port)
+            elif(robot['moving'] == False and movement == True):
+                bob_bot.stop()
+                ev3.Sound.speak("yeet")
+
+                print("Turned Off!")
+            movement = robot['moving']
+        except:
+            url = "http://{}:{}/getmovement".format(ip_addr,port)
             print("GET request: {} failed at {}".format(url,datetime.datetime.now()))
-        time.sleep(2)
+            traceback.print_exc()
+
+        time.sleep(1)
 
 class MyListener:
     def __init__(self,run_robot):
@@ -55,21 +75,30 @@ class MyListener:
         port = info.port
         print(ip_addr,port,name)
         if (name == "assis10t._http._tcp.local."):
-            r = requests.get("http://{}:{}/ping".format(ip_addr,port))
-            # wait for response
-            if (r.text == "pong"):
-                print("Server running on {}:{}".format(ip_addr,port))
-                if (self.run_robot):
-                    ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
-                    # TODO: add light to indicate status
-                poller = Thread(target=polling, name="poller",args=(ip_addr,port,self.run_robot))
-                poller.start()
-            else:
-                print("Server did not respond!")
+            #TODO: call get 3 times
+            try:
+                r = requests.get("http://{}:{}/ping".format(ip_addr,port))
+                # wait for response
+                if (r.text == "pong"):
+                    print("Server running on {}:{}".format(ip_addr,port))
+
+                    if (self.run_robot):
+                        ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
+                        ev3.Sound.speak("i am bob. Beep. i collect your shopping").wait()
+                        # TODO: add light to indicate status
+                    poller = Thread(target=polling, name="poller",args=(ip_addr,port,self.run_robot))
+                    poller.start()
+                else:
+                    print("Server did not respond!")
+                    if (self.run_robot):
+                        ev3.Sound.tone([(750, 250, 0),(750, 250, 0)]).wait()
+                        # TODO: add light to indicate status
+            except:
+                print("Failed to connect to server!")
+                traceback.print_exc()
                 if (self.run_robot):
                     ev3.Sound.tone([(750, 250, 0),(750, 250, 0)]).wait()
                     # TODO: add light to indicate status
-           
 
 
 
@@ -97,6 +126,8 @@ if __name__ == "__main__":
         else:
             print("Unable to start client as ev3 package not present and test mode not indicated")
             exit()
+    if (run_robot):
+        ev3.Sound.beep().wait()
     zeroconf = Zeroconf()
     listener = MyListener(run_robot)
     browser = ServiceBrowser(zeroconf, "_http._tcp.local.", listener)
@@ -105,4 +136,3 @@ if __name__ == "__main__":
         input("Press enter to exit...\n\n")
     finally:
         zeroconf.close()
-    

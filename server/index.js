@@ -88,16 +88,22 @@ app.post('/items', (req, res, next) => {
         .catch(next)
 })
 
-app.get('/turnon', (req, res, next) => {
+app.put('/turnon', (req, res, next) => {
     model
         .turnOn()
-        .then(count => res.json({ success: true, count }))
+        .then(on => res.json({ success: true, on }))
         .catch(next)
 })
-app.get('/turnoff', (req, res, next) => {
+app.put('/turnoff', (req, res, next) => {
     model
         .turnOff()
         .then(off => res.json({ success: true, off }))
+        .catch(next)
+})
+app.get('/getmovement', (req, res, next) => {
+    model
+        .getMovement()
+        .then(status => res.json({ success: true, status }))
         .catch(next)
 })
 

@@ -23,6 +23,12 @@ module.exports.init = () => {
                 return
             }
             db = client.db('bob')
+            //FOR DEMO 1
+            db.collection('bob_movement').insertOne({ _id: 'movement', moving: false }, (err, doc) => {
+                if (err) {
+                    console.log('Movment already in database')
+                }
+            })
             res(db)
             //console.log(`Initialized database connection on ${mongo_url}.`)
         })
