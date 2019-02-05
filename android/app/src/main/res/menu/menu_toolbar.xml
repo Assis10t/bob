@@ -4,4 +4,8 @@
             android:id="@+id/login"
             android:title="Login"
             app:showAsAction="never"/>
+    <item
+            android:id="@+id/zeroconf_bypass"
+            android:title="Zeroconf Bypass"
+            app:showAsAction="never"/>
 </menu>
