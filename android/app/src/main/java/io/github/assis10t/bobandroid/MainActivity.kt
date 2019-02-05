@@ -1,13 +1,12 @@
 package io.github.assis10t.bobandroid
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
 import io.github.assis10t.bobandroid.pojo.Item
 import io.github.assis10t.bobandroid.pojo.Order
@@ -16,11 +15,13 @@ import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
-    private val TAG = "MainActivity"
+    var loggedIn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        loggedIn = intent.getBooleanExtra("loggedIn", false)
 
         container.isRefreshing = true
         container.setOnRefreshListener { refreshItems() }
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
                 make_order.show()
         }
 
-        //make_order.hide()
+        make_order.hide()
         make_order.setOnClickListener {
             container.isRefreshing = true
             make_order.hide()
@@ -49,6 +50,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         refreshItems()
     }
@@ -63,7 +68,27 @@ class MainActivity : AppCompatActivity() {
             }
             Timber.d("GetItems success. Items: ${items?.size}")
             val adapter = item_list.adapter as ItemAdapter
-            adapter.updateItems(items!!)
+            //TODO: Remove if condition.
+            if (loggedIn)
+                adapter.updateItems(items!!)
+            else
+                adapter.updateItems(listOf())
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_toolbar, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.login -> {
+                startActivity(Intent(this, LoginActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
