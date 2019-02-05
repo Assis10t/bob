@@ -71,9 +71,10 @@ app.get('/jobs', (req, res, next) => {
         .catch(next)
 })
 
-app.put('/turnon', (req,res,next) => {
+app.put('/turnon/:nOfMarkers', (req,res,next) => {
+    const markers = req.params.nOfMarkers
     model
-        .turnOn()
+        .turnOn(markers)
         .then(on => res.json({success: true, on}))
         .catch(next)
 })
