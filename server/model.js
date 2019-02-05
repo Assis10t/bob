@@ -67,11 +67,11 @@ const factory = db => ({
                 err ? rej(err) : res(docs)
             })
         }),
-    turnOn: () =>
+    turnOn: markers =>
         new Promise((res,rej) => {
             db()
                 .collection('bob_movement')
-                .updateOne({"_id":"movement"}, {"$set":{"moving":true}}, (err, count_modified) => {
+                .updateOne({"_id":"movement"}, {"$set":{"moving":true,"markers":parseInt(markers)}}, (err, count_modified) => {
                     err ? rej(err) : res('on')
                 })
             }),

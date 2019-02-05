@@ -1,9 +1,22 @@
 <html>
     <head>
+        <style>
+            body {
+                font-family:Verdana, Geneva, Tahoma, sans-serif
+            }
+            h1 {
+                font-weight: normal
+            }
+            button {
+                padding: 10px;
+            }
+        </style>
         <script>
             function turnOn() {
+                var marker_count = document.getElementById('marker_count').value
+                
                 console.log("Turn On!")
-                var url = "http://localhost:9000/turnon";
+                var url = "http://localhost:9000/turnon/" + marker_count;
                 var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
                 xmlhttp.onreadystatechange = function () {
                     if(xmlhttp.readyState === 4) {
@@ -29,6 +42,7 @@
     </head>
     <body>
         <h1>Start BOB!</h1>
+        <div><span>Marker Count: </span><input id='marker_count'></input></div>
         <button onclick="turnOn()">Start!</button>
         <h1>Stop BOB!</h1>
         <button onclick="turnOff()">Stop!</button>
