@@ -54,6 +54,13 @@ class ServerConnection {
                 Timber.d("Server found at $ip")
             }
         }
+
+        fun zeroconfBypass(address: String) {
+            Timber.d("Bypassed zeroconf: $address")
+            serverAddress = "http://$address:9000"
+            onConnectedListeners.forEach { it(serverAddress!!) }
+            onConnectedListeners.clear()
+        }
     }
 
     fun connect(onConnected: (String) -> Unit) {
@@ -146,7 +153,7 @@ class ServerConnection {
     val loginFactory = { http: OkHttpClient, gson: Gson ->
         { username: String, password: String, onLoginComplete: ((success: Boolean, loggedIn: Boolean) -> Unit)? ->
             connect { server ->
-                postRequestFactory(http, gson)("$server/order", LoginRequest(username, password)) { success, str ->
+                postRequestFactory(http, gson)("$server/login", LoginRequest(username, password)) { success, str ->
                     Timber.d("Result: $success, response: $str")
                     if (!success) {
                         onLoginComplete?.invoke(success, false)
@@ -163,7 +170,7 @@ class ServerConnection {
     val registerFactory = { http: OkHttpClient, gson: Gson ->
         { username: String, password: String, onRegisterComplete: ((success: Boolean) -> Unit)? ->
             connect { server ->
-                postRequestFactory(http, gson)("$server/order", RegisterRequest(username, password)) { success, str ->
+                postRequestFactory(http, gson)("$server/register", RegisterRequest(username, password)) { success, str ->
                     Timber.d("Result: $success, response: $str")
                     if (!success) {
                         onRegisterComplete?.invoke(success)
