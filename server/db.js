@@ -24,7 +24,7 @@ module.exports.init = () => {
             }
             db = client.db('bob')
             //FOR DEMO 1
-            db.collection('bob_movement').insertOne({"_id":"movement","moving":false}, (err,doc) => {
+            db.collection('bob_movement').insertOne({"_id":"movement","moving":false,"markers":1}, (err,doc) => {
                 if (err) {
                     console.log("Movment already in database")
                 }
