@@ -71,6 +71,7 @@ app.get('/jobs', (req, res, next) => {
         .catch(next)
 })
 
+<<<<<<< HEAD
 app.put('/turnon', (req,res,next) => {
     model
         .turnOn()
@@ -87,6 +88,41 @@ app.get('/getmovement', (req,res,next) => {
     model
         .getMovement()
         .then(status => res.json({success:true, status}))
+=======
+app.get('/items', (req, res, next) => {
+    model
+        .getItems()
+        .then(items => {
+            if (items) res.json({ success: true, items })
+            else res.status(404).json({ success: true, items: null })
+        })
+        .catch(next)
+})
+
+app.post('/items', (req, res, next) => {
+    model
+        .addItem(req.body)
+        .then(item => res.json({ success: true, item }))
+        .catch(next)
+})
+
+app.put('/turnon', (req, res, next) => {
+    model
+        .turnOn()
+        .then(on => res.json({ success: true, on }))
+        .catch(next)
+})
+app.put('/turnoff', (req, res, next) => {
+    model
+        .turnOff()
+        .then(off => res.json({ success: true, off }))
+        .catch(next)
+})
+app.get('/getmovement', (req, res, next) => {
+    model
+        .getMovement()
+        .then(status => res.json({ success: true, status }))
+>>>>>>> 1339882e609619cd14b45720a5a2a734b8a407d6
         .catch(next)
 })
 
@@ -104,7 +140,13 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(PORT, () => {
+<<<<<<< HEAD
   console.log(`Listening on port ${PORT}.`)
   
 })
 bonjour.publish({ name: 'assis10t', type: 'http', port: PORT })
+=======
+    console.log(`Listening on port ${PORT}.`)
+})
+bonjour.publish({ name: 'assis10t', type: 'http', host: utils.getIp(), port: PORT })
+>>>>>>> 1339882e609619cd14b45720a5a2a734b8a407d6
