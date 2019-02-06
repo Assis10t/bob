@@ -1,14 +1,7 @@
 package io.github.assis10t.bobandroid
 
-<<<<<<< HEAD
-import android.os.AsyncTask
-import android.util.Log
-import java.net.Inet4Address
-=======
 import com.google.gson.Gson
-import io.github.assis10t.bobandroid.pojo.GetItemsResponse
-import io.github.assis10t.bobandroid.pojo.Item
-import io.github.assis10t.bobandroid.pojo.Order
+import io.github.assis10t.bobandroid.pojo.*
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -17,35 +10,11 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import timber.log.Timber
 import java.io.IOException
-import java.util.concurrent.TimeUnit
->>>>>>> 1339882e609619cd14b45720a5a2a734b8a407d6
 import javax.jmdns.JmDNS
 import javax.jmdns.ServiceEvent
 import javax.jmdns.ServiceListener
 
 class ServerConnection {
-<<<<<<< HEAD
-
-    companion object {
-        private val TAG = "ServerConnection"
-        val SERVER_NAME = "assis10t"
-        var serverIp: String? = null
-
-        val onConnectedListeners: MutableList<(String) -> Unit> = mutableListOf()
-
-        class ConnectTask: AsyncTask<Unit, JmDNS, Unit>() {
-            override fun doInBackground(vararg params: Unit?) {
-                Log.d(TAG, "Discovery started")
-                val mJmDNS = JmDNS.create()
-                mJmDNS.addServiceListener("_http._tcp.local.", object : ServiceListener {
-                    override fun serviceResolved(event: ServiceEvent?) {
-                        val info = mJmDNS.getServiceInfo(event!!.type, event.name)
-                        Log.d(TAG, "Service resolved: $info")
-                        if (info.name.contains(SERVER_NAME)) {
-                            serverIp = "${info.inet4Addresses[0]!!.hostAddress}:${info.port}"
-                            onConnectedListeners.forEach { it(serverIp!!) }
-                            onConnectedListeners.clear()
-=======
     companion object {
         val SERVER_NAME = "assis10t"
         var serverAddress: String? = null
@@ -68,51 +37,33 @@ class ServerConnection {
                                 onConnectedListeners.forEach { it(serverAddress!!) }
                                 onConnectedListeners.clear()
                             }
->>>>>>> 1339882e609619cd14b45720a5a2a734b8a407d6
                         }
                     }
 
                     override fun serviceRemoved(event: ServiceEvent?) {
-<<<<<<< HEAD
-                        Log.d(TAG, "Service removed")
-=======
                         Timber.d("Service removed")
->>>>>>> 1339882e609619cd14b45720a5a2a734b8a407d6
                     }
 
                     override fun serviceAdded(event: ServiceEvent?) {
                         val info = mJmDNS.getServiceInfo(event!!.type, event.name)
-<<<<<<< HEAD
-                        Log.d(TAG, "Service added: $info")
-                    }
-                })
-            }
-        }
-
-        fun initialize() {
-            ConnectTask().execute()
-            ServerConnection().connect { ip ->
-                Log.d(TAG, "Server found at $ip")
-=======
                         Timber.d("Service added: $info")
                     }
                 })
             }
             ServerConnection().connect { ip ->
                 Timber.d("Server found at $ip")
->>>>>>> 1339882e609619cd14b45720a5a2a734b8a407d6
             }
+        }
+
+        fun zeroconfBypass(address: String) {
+            Timber.d("Bypassed zeroconf: $address")
+            serverAddress = "http://$address:9000"
+            onConnectedListeners.forEach { it(serverAddress!!) }
+            onConnectedListeners.clear()
         }
     }
 
     fun connect(onConnected: (String) -> Unit) {
-<<<<<<< HEAD
-        if (serverIp != null)
-            onConnected(serverIp!!)
-        else
-            onConnectedListeners.add(onConnected)
-    }
-=======
         if (serverAddress != null)
             onConnected(serverAddress!!)
         else
@@ -190,7 +141,7 @@ class ServerConnection {
                     if (!success) {
                         onOrderComplete?.invoke(success)
                     } else {
-                        val response = gson.fromJson(str!!, GetItemsResponse::class.java)
+                        val response = gson.fromJson(str!!, GenericResponse::class.java)
                         onOrderComplete?.invoke(response.success)
                     }
                 }
@@ -198,5 +149,38 @@ class ServerConnection {
         }
     }
     val makeOrder = makeOrderFactory(httpClient, Gson())
->>>>>>> 1339882e609619cd14b45720a5a2a734b8a407d6
+
+    val loginFactory = { http: OkHttpClient, gson: Gson ->
+        { username: String, password: String, onLoginComplete: ((success: Boolean, loggedIn: Boolean) -> Unit)? ->
+            connect { server ->
+                postRequestFactory(http, gson)("$server/login", LoginRequest(username, password)) { success, str ->
+                    Timber.d("Result: $success, response: $str")
+                    if (!success) {
+                        onLoginComplete?.invoke(success, false)
+                    } else {
+                        val response = gson.fromJson(str!!, LoginResponse::class.java)
+                        onLoginComplete?.invoke(response.success, response.loggedIn)
+                    }
+                }
+            }
+        }
+    }
+    val login = loginFactory(httpClient, Gson())
+
+    val registerFactory = { http: OkHttpClient, gson: Gson ->
+        { username: String, password: String, onRegisterComplete: ((success: Boolean) -> Unit)? ->
+            connect { server ->
+                postRequestFactory(http, gson)("$server/register", RegisterRequest(username, password)) { success, str ->
+                    Timber.d("Result: $success, response: $str")
+                    if (!success) {
+                        onRegisterComplete?.invoke(success)
+                    } else {
+                        val response = gson.fromJson(str!!, GenericResponse::class.java)
+                        onRegisterComplete?.invoke(response.success)
+                    }
+                }
+            }
+        }
+    }
+    val register = registerFactory(httpClient, Gson())
 }

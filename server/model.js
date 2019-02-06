@@ -25,7 +25,14 @@ const factory = db => ({
             db()
                 .collection('orders')
                 .insertOne(orderData, (err, order) => {
-                    err ? rej(err) : res(orderData)
+                    if (err) {
+                        rej(err)
+                        return
+                    }
+                    Promise.all(orderData.items.map(i => factory(db).removeItem(i)))
+                        .then(() => factory(db).turnOn())
+                        .then(() => res(orderData))
+                        .catch(err => rej(err))
                 })
         }),
     addJob: jobData => 
@@ -68,6 +75,50 @@ const factory = db => ({
                 .find({})
                 .toArray((err,docs) => {
                     err ? rej(err) : res(docs[0])
+                })
+        }),
+
+    addItem: item =>
+        new Promise((res, rej) => {
+            db()
+                .collection('inventory')
+                .insertOne({ _id: new ObjectID(), ...item }, (err, item) => {
+                    err ? rej(err) : res(item)
+                })
+        }),
+    removeItem: item =>
+        new Promise((res, rej) => {
+            db()
+                .collection('inventory')
+                .deleteOne({ _id: new ObjectID(item._id) }, (err, item) => {
+                    err ? rej(err) : res(item)
+                })
+        }),
+    getItems: () =>
+        new Promise((res, rej) => {
+            db()
+                .collection('inventory')
+                .find({})
+                .toArray((err, items) => {
+                    err ? rej(err) : res(items)
+                })
+        }),
+    createUser: (uname, pass) =>
+        new Promise((res, rej) => {
+            db()
+                .collection('users')
+                .insertOne({ _id: new ObjectID(), username: uname, password: pass }, (err, user) => {
+                    err ? rej(err) : res(user)
+                })
+        }),
+    authUser: (uname, pass) =>
+        new Promise((res, rej) => {
+            db()
+                .collection('users')
+                .find({ username: uname, password: pass })
+                .toArray((err, users) => {
+                    console.log(users)
+                    err ? rej(err) : res(users.length > 0)
                 })
         })
     
