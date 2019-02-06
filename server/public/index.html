@@ -14,17 +14,20 @@
         <script>
             function turnOn() {
                 var marker_count = document.getElementById('marker_count').value
-                
-                console.log("Turn On!")
-                var url = "http://localhost:9000/turnon/" + marker_count;
-                var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
-                xmlhttp.onreadystatechange = function () {
-                    if(xmlhttp.readyState === 4) {
-                        console.log(xmlhttp.responseText);
-                    }
-                };
-                xmlhttp.open("PUT", url);
-                xmlhttp.send();
+                if (parseInt(marker_count) <= 0) {
+                    alert("Please enter a number of markers greater than 0!")
+                } else {
+                    console.log("Turn On!")
+                    var url = "http://localhost:9000/turnon/" + marker_count;
+                    var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+                    xmlhttp.onreadystatechange = function () {
+                        if(xmlhttp.readyState === 4) {
+                            console.log(xmlhttp.responseText);
+                        }
+                    };
+                    xmlhttp.open("PUT", url);
+                    xmlhttp.send();
+                }
             }
             function turnOff() {
                 console.log("Turn off!")
