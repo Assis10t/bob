@@ -71,7 +71,6 @@ app.get('/jobs', (req, res, next) => {
         .catch(next)
 })
 
-
 app.put('/turnon/:nOfMarkers', (req,res,next) => {
     const markers = req.params.nOfMarkers
     model
@@ -89,40 +88,6 @@ app.get('/getmovement', (req,res,next) => {
     model
         .getMovement()
         .then(status => res.json({success:true, status}))
-})
-app.get('/items', (req, res, next) => {
-    model
-        .getItems()
-        .then(items => {
-            if (items) res.json({ success: true, items })
-            else res.status(404).json({ success: true, items: null })
-        })
-        .catch(next)
-})
-
-app.post('/items', (req, res, next) => {
-    model
-        .addItem(req.body)
-        .then(item => res.json({ success: true, item }))
-        .catch(next)
-})
-
-app.put('/turnon', (req, res, next) => {
-    model
-        .turnOn()
-        .then(on => res.json({ success: true, on }))
-        .catch(next)
-})
-app.put('/turnoff', (req, res, next) => {
-    model
-        .turnOff()
-        .then(off => res.json({ success: true, off }))
-        .catch(next)
-})
-app.get('/getmovement', (req, res, next) => {
-    model
-        .getMovement()
-        .then(status => res.json({ success: true, status }))
         .catch(next)
 })
 
