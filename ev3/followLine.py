@@ -51,7 +51,6 @@ class FollowLine:
             self.consecutive_colours = 0
         return -1
 
-
     @staticmethod
     def on_line(sensor_value, position):
         if position == 'left':
