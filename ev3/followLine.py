@@ -23,12 +23,14 @@ class FollowLine:
         # colour sensors
         self.csfl = ev3.ColorSensor('in1')  # colour sensor front left
         self.csfr = ev3.ColorSensor('in2')  # colour sensor front right
-        self.csb = ev3.ColorSensor('in3')  # colour sensor back
+        self.csbl = ev3.ColorSensor('in3')  # colour sensor back left
+        self.csbr = ev3.ColorSensor('in4')  # colour sensor back right
         assert self.csfl.connected
         assert self.csfr.connected
         self.csfl.mode = 'COL-REFLECT'  # measure light intensity
         self.csfr.mode = 'COL-REFLECT'  # measure light intensity
-        self.csb.mode = 'COL-COLOR'  # measure colour
+        self.csbl.mode = 'COL-COLOR'  # measure colour
+        self.csbr.mode = 'COL-COLOR'
 
         # motors
         self.lm = ev3.LargeMotor('outA')  # left motor
@@ -40,8 +42,10 @@ class FollowLine:
 
         self.runner = None
 
+        self.reverse = False
+
     def detect_marking(self):
-        colour = self.csb.value()
+        colour = self.csbl.value()
         if colour == 3 or colour == 2:  # 3 = green 2 = blue
             self.consecutive_colours += 1
             print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
@@ -60,7 +64,7 @@ class FollowLine:
         logging.error("onLine: wrong position value for sensor")
         return False
 
-    def correct_trajectory(self, csfl, csfr, lm, rm, number_of_markers):
+    def correct_trajectory(self, lm, rm, number_of_markers):
         integral = 0
         previous_error = 0
         marker_counter = 0
@@ -68,8 +72,12 @@ class FollowLine:
         interval_between_colors = 2 # time between marker checks in seconds
 
         while not self.shut_down:
-            lval = csfl.value()
-            rval = csfr.value()
+            if self.reverse:
+                lval = self.csbr.value()  # back right becomes front left
+                rval = self.csbl.value()
+            else:
+                lval = self.csfl.value()
+                rval = self.csfr.value()
             error = lval - rval - 10
             logging.info("PID error: ", error)
             integral += (error * self.DT)
@@ -89,8 +97,12 @@ class FollowLine:
                     u = self.MOTOR_SPEED - 1000
 
             # run motors
-            lm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED + u))
-            rm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED - u))
+            if self.reverse:
+                lm.run_timed(time_sp=self.DT, speed_sp=self.MOTOR_SPEED - u)
+                rm.run_timed(time_sp=self.DT, speed_sp=self.MOTOR_SPEED + u)
+            else:
+                lm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED + u))
+                rm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED - u))
             sleep(self.DT / 1000)
 
             print("u {}".format(u))
@@ -117,7 +129,7 @@ class FollowLine:
 
 
     def run(self, number_of_markers):
-        self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm, number_of_markers)
+        self.correct_trajectory(self.lm, self.rm, number_of_markers)
         self.stop()
 
     def stop(self):
