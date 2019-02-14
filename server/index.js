@@ -61,6 +61,7 @@ app.post('/jobs', (req, res, next) => {
         .then(job => res.json({ success: true, job }))
         .catch(next)
 })
+
 app.get('/jobs', (req, res, next) => {
     model
         .getAllJobs(req.body)
@@ -70,7 +71,6 @@ app.get('/jobs', (req, res, next) => {
         })
         .catch(next)
 })
-
 app.get('/items', (req, res, next) => {
     model
         .getItems()
@@ -87,10 +87,10 @@ app.post('/items', (req, res, next) => {
         .then(item => res.json({ success: true, item }))
         .catch(next)
 })
-
-app.put('/turnon', (req, res, next) => {
+app.put('/turnon/:nOfMarkers', (req, res, next) => {
+    const markers = req.params.nOfMarkers
     model
-        .turnOn()
+        .turnOn(markers)
         .then(on => res.json({ success: true, on }))
         .catch(next)
 })
@@ -106,10 +106,22 @@ app.get('/getmovement', (req, res, next) => {
         .then(status => res.json({ success: true, status }))
         .catch(next)
 })
+app.post('/register', (req, res, next) => {
+    model
+        .createUser(req.body.username, req.body.password)
+        .then(status => res.json({ success: true, status }))
+        .catch(next)
+})
+app.post('/login', (req, res, next) => {
+    model
+        .authUser(req.body.username, req.body.password)
+        .then(loggedIn => res.json({ success: true, loggedIn }))
+        .catch(next)
+})
 
 //Logs all responses.
 app.use((req, res, next) => {
-    console.log(`${req.ip}: ${req.method} ${req.originalUrl} response: ${res.body}`)
+    console.log(`${req.ip}: ${req.method} ${req.originalUrl} response: ${res.body || ''}`)
     next()
 })
 

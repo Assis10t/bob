@@ -30,6 +30,7 @@ const factory = db => ({
                         return
                     }
                     Promise.all(orderData.items.map(i => factory(db).removeItem(i)))
+                        .then(() => factory(db).turnOn(1))
                         .then(() => res(orderData))
                         .catch(err => rej(err))
                 })
@@ -51,13 +52,17 @@ const factory = db => ({
                     err ? rej(err) : res(docs)
                 })
         }),
-    turnOn: () =>
+    turnOn: markers =>
         new Promise((res, rej) => {
             db()
                 .collection('bob_movement')
-                .updateOne({ _id: 'movement' }, { $set: { moving: true } }, (err, count_modified) => {
-                    err ? rej(err) : res('on')
-                })
+                .updateOne(
+                    { _id: 'movement' },
+                    { $set: { moving: true, markers: parseInt(markers) } },
+                    (err, count_modified) => {
+                        err ? rej(err) : res('on')
+                    }
+                )
         }),
     turnOff: () =>
         new Promise((res, rej) => {
@@ -100,6 +105,24 @@ const factory = db => ({
                 .find({})
                 .toArray((err, items) => {
                     err ? rej(err) : res(items)
+                })
+        }),
+    createUser: (uname, pass) =>
+        new Promise((res, rej) => {
+            db()
+                .collection('users')
+                .insertOne({ _id: new ObjectID(), username: uname, password: pass }, (err, user) => {
+                    err ? rej(err) : res(user)
+                })
+        }),
+    authUser: (uname, pass) =>
+        new Promise((res, rej) => {
+            db()
+                .collection('users')
+                .find({ username: uname, password: pass })
+                .toArray((err, users) => {
+                    console.log(users)
+                    err ? rej(err) : res(users.length > 0)
                 })
         })
 })

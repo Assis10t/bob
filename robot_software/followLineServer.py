@@ -63,25 +63,15 @@ class FollowLine:
             self.consecutive_colours = 0
         return -1
 
-    @staticmethod
-    def on_line(sensor_value, position):
-        if position == 'left':
-            return sensor_value < 30
-        if position == 'right':
-            return sensor_value < 40
-        logging.error("onLine: wrong position value for sensor")
-        return False
-
     # limit motor speed to safe values: [-1000, 1000] deg/sec
-    @staticmethod
-    def limit_speed(speed):
+    def limit_speed(self, speed):
         if speed > 1000:
             return 1000
         if speed < -1000:
             return -1000
         return speed
 
-    def correct_trajectory(self, lm, rm, number_of_markers):
+    def correct_trajectory(self):
         integral = 0
         previous_error = 0
         marker_counter = 0
@@ -131,7 +121,7 @@ class FollowLine:
                     marker_counter += 1
                     ev3.Sound.beep()
                     start_time = time()
-                    if marker_counter >= number_of_markers:
+                    if marker_counter >= self.number_of_markers:
                         self.stop()
                 elif marker_colour == 2:
                     # stop on blue marker
@@ -153,7 +143,7 @@ class FollowLine:
             self.runner.start()
 
     def run(self):
-        self.correct_trajectory(self.lm, self.rm, self.number_of_markers)
+        self.correct_trajectory()
         self.stop()
 
     def stop(self):
