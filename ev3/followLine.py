@@ -135,9 +135,8 @@ class FollowLine:
                         self.stop()
                 elif marker_colour == 2:
                     # stop on blue marker
-
-                    self.reverse = not self.reverse
-                    #self.stop()
+                    self.stop()
+                    # self.reverse = not self.reverse
 
     def move_sideways(self, cm):
         while not self.shut_down:
