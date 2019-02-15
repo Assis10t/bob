@@ -124,6 +124,22 @@ const factory = db => ({
                     console.log(users)
                     err ? rej(err) : res(users.length > 0)
                 })
+        }),
+    setHome: (robot_id,home_x,home_y) => 
+        new Promise((res, rej) => {
+            db()
+                .collection('robot')
+                .updateOne({_id : robot_id}, {$set: {"home_x": home_x, "home_y":home_y}}, (err, warehouse) => {
+                    err ? rej(err) :res(warehouse);
+                });
+        }),
+    addRobot: (robot_id, home_x, home_y) =>
+        new Promise((res,rej) => {
+            db()
+                .collection('robot')
+                .insertOne({_id: robot_id, "home_x":home_x, "home_y":home_y}, (err,robot) => {
+                    err ? rej(err) : res(robot)
+                });
         })
 })
 

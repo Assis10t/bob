@@ -4,7 +4,7 @@ const db = require('./db')
 const model = require('./model')
 const bonjour = require('bonjour')()
 const utils = require('./utils')
-
+const robot_path = require('./robot-pathfinding.js')
 const PORT = process.env.PORT || 9000
 
 db.init()
@@ -118,6 +118,18 @@ app.post('/login', (req, res, next) => {
         .then(loggedIn => res.json({ success: true, loggedIn }))
         .catch(next)
 })
+app.post('/robotcommand/:robotid', (req,res,next) => {
+    model
+        .setHome(req.params.robotid, req.body.home_x, req.body.home_y)
+        .then(robot => res.json({success: true, robot}))
+        .catch(next)
+})
+app.post('/robotcommand', (req,res,next) => {
+    model
+        .addRobot(req.body.id, req.body.home_x, req.body.home_y)
+        .then(robot => res.json({success: true, robot}))
+        .catch(next)
+})
 
 //Logs all responses.
 app.use((req, res, next) => {
@@ -136,3 +148,5 @@ app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}.`)
 })
 bonjour.publish({ name: 'assis10t', type: 'http', host: utils.getIp(), port: PORT })
+var g = robot_path.makeWarehouse(5,5,[[1,1,3],[3,3,3]]);
+robot_path.pathfind_to_point([0,0],[2,2],g);
