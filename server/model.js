@@ -152,6 +152,7 @@ const factory = db => ({
                     err ? rej(err) : res(robot)
                 });
         }),
+    // TODO: add promises to prevent mega intentation
     getNextJob: (robot_id) =>
         new Promise((res,rej) => {
             db()
@@ -164,10 +165,18 @@ const factory = db => ({
                         db().collection('robot')
                         .find({"_id":robot_id})
                         .toArray((err,robot) => {
+                            
                             if (err) {
                                 rej(err)
                             } else {
-                                res(robotPathfinding.convert_order_to_job(orders[0],robot))   
+                                db()
+                                    .collection('warehouse')
+                                    // TODO implement warehouseID
+                                    .find({})
+                                    .toArray((err,warehouse) => {
+                                        res(robotPathfinding.get_robot_path(orders[0],robot[0],warehouse[0]))   
+                                    })
+                                
                             }
                         })
                         

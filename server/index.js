@@ -154,5 +154,3 @@ app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}.`)
 })
 bonjour.publish({ name: 'assis10t', type: 'http', host: utils.getIp(), port: PORT })
-var g = robot_path.makeWarehouse(5,5,[[1,1,3],[3,3,3]]);
-robot_path.pathfind_to_point([0,0],[2,2],g);
