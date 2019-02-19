@@ -130,6 +130,12 @@ app.post('/robotcommand', (req,res,next) => {
         .then(robot => res.json({success: true, robot}))
         .catch(next)
 })
+app.get('/robotcommand/getnextjob',(req,res,next) => {
+    model 
+        .getNextJob()
+        .then(job => res.json({success:true, robot}))
+        .catch(next)
+})
 
 //Logs all responses.
 app.use((req, res, next) => {

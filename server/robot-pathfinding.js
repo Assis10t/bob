@@ -1,4 +1,5 @@
 var PF = require('pathfinding');
+const db = require('./db')
 
 module.exports.makeWarehouse = (width,height, shelves) => {
     // create grid
@@ -34,5 +35,9 @@ module.exports.pathfind_to_point = (current_pos,end_pos, warehouse_grid) => {
     var path = finder.findPath(current_pos[0],current_pos[1], end_pos[0], end_pos[1], pf_grid);
     path = PF.Util.compressPath(path);
     console.log(path);
-
+}
+module.exports.convert_order_to_job = (order) => {
+    console.log(order);
+    
+    return {}
 }

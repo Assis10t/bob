@@ -1,4 +1,5 @@
 const db = require('./db')
+const robotPathfinding = require('./robot-pathfinding')
 const assert = require('assert')
 const ObjectID = require('mongodb').ObjectID
 const factory = db => ({
@@ -140,6 +141,19 @@ const factory = db => ({
                 .insertOne({_id: robot_id, "home_x":home_x, "home_y":home_y}, (err,robot) => {
                     err ? rej(err) : res(robot)
                 });
+        }),
+    getNextJob: () =>
+        new Promise((res,rej) => {
+            db()
+                .collection('orders')
+                .find({"status":"PENDING"})
+                .toArray((err, orders) => {
+                    if (err) {
+                        rej(err)
+                    } else {
+                        res(robotPathfinding.convert_order_to_job(orders[0]))
+                    }
+                })
         })
 })
 
