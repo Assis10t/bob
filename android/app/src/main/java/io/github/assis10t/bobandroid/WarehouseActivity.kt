@@ -10,23 +10,17 @@ import android.view.*
 import android.widget.TextView
 import io.github.assis10t.bobandroid.pojo.Item
 import io.github.assis10t.bobandroid.pojo.Order
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_warehouse.*
 import timber.log.Timber
-import android.R.string.cancel
-import android.content.DialogInterface
-import android.support.v7.app.AlertDialog
-import android.text.InputType
-import android.widget.EditText
 
 
-
-class MainActivity : AppCompatActivity() {
+class WarehouseActivity : AppCompatActivity() {
 
     var loggedIn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_warehouse)
 
         loggedIn = intent.getBooleanExtra("loggedIn", false)
 
