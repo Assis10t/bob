@@ -16,7 +16,7 @@ const factory = db => ({
         new Promise((res, rej) => {
             db()
                 .collection('orders')
-                .find({ _id: new ObjectID(orderId) })
+                .find({ _id: orderId })
                 .toArray((err, docs) => {
                     err ? rej(err) : res(docs[0])
                 })
@@ -95,7 +95,7 @@ const factory = db => ({
         new Promise((res, rej) => {
             db()
                 .collection('inventory')
-                .deleteOne({ _id: new ObjectID(item._id) }, (err, item) => {
+                .deleteOne({ _id: item._id}, (err, item) => {
                     err ? rej(err) : res(item)
                 })
         }),
@@ -131,18 +131,28 @@ const factory = db => ({
             db()
                 .collection('robot')
                 .updateOne({_id : robot_id}, {$set: {"home_x": home_x, "home_y":home_y}}, (err, warehouse) => {
-                    err ? rej(err) :res(warehouse);
+                    err ? rej(err) : res(warehouse);
                 });
         }),
     addRobot: (robot_id, home_x, home_y) =>
         new Promise((res,rej) => {
             db()
                 .collection('robot')
-                .insertOne({_id: robot_id, "home_x":home_x, "home_y":home_y}, (err,robot) => {
+                .insertOne(
+                            {   
+                                _id: robot_id, 
+                                home_x:home_x,
+                                home_y:home_y,
+                                location: {
+                                    x:0,
+                                    y:0,
+                                    z:0
+                                }
+                            }, (err,robot) => {
                     err ? rej(err) : res(robot)
                 });
         }),
-    getNextJob: () =>
+    getNextJob: (robot_id) =>
         new Promise((res,rej) => {
             db()
                 .collection('orders')
@@ -151,7 +161,16 @@ const factory = db => ({
                     if (err) {
                         rej(err)
                     } else {
-                        res(robotPathfinding.convert_order_to_job(orders[0]))
+                        db().collection('robot')
+                        .find({"_id":robot_id})
+                        .toArray((err,robot) => {
+                            if (err) {
+                                rej(err)
+                            } else {
+                                res(robotPathfinding.convert_order_to_job(orders[0],robot))   
+                            }
+                        })
+                        
                     }
                 })
         })

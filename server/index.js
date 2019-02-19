@@ -126,14 +126,14 @@ app.post('/robotcommand/:robotid', (req,res,next) => {
 })
 app.post('/robotcommand', (req,res,next) => {
     model
-        .addRobot(req.body.id, req.body.home_x, req.body.home_y)
+        .addRobot(req.body._id, req.body.home_x, req.body.home_y)
         .then(robot => res.json({success: true, robot}))
         .catch(next)
 })
 app.get('/robotcommand/getnextjob',(req,res,next) => {
     model 
-        .getNextJob()
-        .then(job => res.json({success:true, robot}))
+        .getNextJob(req.body.robot_id)
+        .then(job => res.json({success:true, job}))
         .catch(next)
 })
 
