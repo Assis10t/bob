@@ -91,22 +91,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, LoginActivity::class.java))
                 true
             }
-            R.id.zeroconf_bypass -> {
-                val builder = AlertDialog.Builder(this)
-                builder.setTitle("What's the address of the server?")
-                val input = EditText(this)
-                input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI or InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE
-                input.text.insert(0, "192.168.")
-                builder.setView(input)
-                builder.setPositiveButton("Set") { dialog, which ->
-                    ServerConnection.zeroconfBypass(input.text.toString())
-                }
-                builder.setNegativeButton("Cancel") { dialog, which ->
-                    dialog.cancel()
-                }
-                builder.show()
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
     }

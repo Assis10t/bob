@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Bob Android</string>
+    <string name="app_name">B.O.B.</string>
+    <string name="title_activity_warehouse_list">Shops Near You</string>
 </resources>
