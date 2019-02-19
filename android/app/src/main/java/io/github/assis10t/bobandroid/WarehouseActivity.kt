@@ -4,7 +4,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.CardView
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.TextView
@@ -16,20 +16,16 @@ import timber.log.Timber
 
 class WarehouseActivity : AppCompatActivity() {
 
-    var loggedIn = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_warehouse)
-
-        loggedIn = intent.getBooleanExtra("loggedIn", false)
 
         container.isRefreshing = true
         container.setOnRefreshListener { refreshItems() }
         ServerConnection().connect {
             container.isRefreshing = false
         }
-        item_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        item_list.layoutManager = GridLayoutManager(this, 2)
         item_list.adapter = ItemAdapter { selected ->
             if (selected.isEmpty())
                 make_order.hide()
@@ -93,7 +89,7 @@ class WarehouseActivity : AppCompatActivity() {
         var itemList: List<Item> = listOf()
         val selectedItems: MutableList<Item> = mutableListOf()
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_shop_item, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_warehouse_item, parent, false)
             return ViewHolder(view)
         }
 
@@ -132,7 +128,7 @@ class WarehouseActivity : AppCompatActivity() {
 
         class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
             val title: TextView = view.findViewById(R.id.title)
-            val quantity: TextView = view.findViewById(R.id.quantity)
+            val price: TextView = view.findViewById(R.id.price)
             val container: CardView = view.findViewById(R.id.container)
         }
     }

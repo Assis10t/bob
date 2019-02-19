@@ -15,7 +15,7 @@
                 android:id="@+id/item_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:listitem="@layout/fragment_shop_item"
+                tools:listitem="@layout/fragment_warehouse_item"
                 tools:itemCount="5"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 

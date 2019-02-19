@@ -15,7 +15,7 @@
             android:id="@+id/warehouse_list_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#F5F5F5"
+            app:cardBackgroundColor="#F5F5F5"
             app:cardElevation="8dp"
             app:cardCornerRadius="4dp"
             app:layout_behavior="@string/bottom_sheet_behavior">
