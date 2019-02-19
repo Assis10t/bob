@@ -27,9 +27,10 @@ class LoginActivity : AppCompatActivity() {
                 } else if (!loggedIn) {
                     toast("Wrong username or password.")
                 } else {
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.putExtra("loggedIn", true)
-                    startActivity(intent)
+//                    val intent = Intent(this, WarehouseActivity::class.java)
+//                    intent.putExtra("loggedIn", true)
+//                    startActivity(intent)
+                    onBackPressed() //TODO: Replace with startActivityForResult logic.
                 }
             }
         }
@@ -42,9 +43,10 @@ class LoginActivity : AppCompatActivity() {
                 if (!success) {
                     toast("An error occured while registering.")
                 } else {
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.putExtra("loggedIn", true)
-                    startActivity(intent)
+//                    val intent = Intent(this, WarehouseActivity::class.java)
+//                    intent.putExtra("loggedIn", true)
+//                    startActivity(intent)
+                    onBackPressed() //TODO: Replace with startActivityForResult logic.
                 }
             }
         }
