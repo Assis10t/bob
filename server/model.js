@@ -2,25 +2,26 @@ const db = require('./db')
 const assert = require('assert')
 const ObjectID = require('mongodb').ObjectID
 const factory = db => ({
-    getAllOrders: () =>
+    getOrders: userId =>
         new Promise((res, rej) => {
             db()
                 .collection('orders')
-                .find({})
+                .find({ userId })
                 .toArray((err, docs) => {
                     err ? rej(err) : res(docs)
                 })
         }),
-    getOrderById: orderId =>
+    getOrderById: (orderId, userId) =>
         new Promise((res, rej) => {
             db()
                 .collection('orders')
-                .find({ _id: new ObjectID(orderId) })
+                .find({ _id: orderId, userId })
                 .toArray((err, docs) => {
                     err ? rej(err) : res(docs[0])
                 })
         }),
     addOrder: orderData =>
+        // TODO: Check stock before finishing the order.
         new Promise((res, rej) => {
             db()
                 .collection('orders')
@@ -33,23 +34,6 @@ const factory = db => ({
                         .then(() => factory(db).turnOn(1))
                         .then(() => res(orderData))
                         .catch(err => rej(err))
-                })
-        }),
-    addJob: jobData =>
-        new Promise((res, rej) => {
-            db()
-                .collection('jobs')
-                .insertOne(jobData, (err, job) => {
-                    err ? rej(err) : res(jobData)
-                })
-        }),
-    getAllJobs: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('jobs')
-                .find({})
-                .toArray((err, docs) => {
-                    err ? rej(err) : res(docs)
                 })
         }),
     turnOn: markers =>
@@ -81,48 +65,112 @@ const factory = db => ({
                     err ? rej(err) : res(docs[0])
                 })
         }),
-
-    addItem: item =>
+    getWarehouses: () =>
+        new Promise((res, rej) => {
+            db()
+                .collection('warehouses')
+                .find({})
+                .toArray((err, docs) => {
+                    err ? rej(err) : res(docs)
+                })
+        }),
+    getWarehouseById: warehouseId =>
+        new Promise((res, rej) => {
+            db()
+                .collection('warehouses')
+                .find({ _id: warehouseId })
+                .toArray((err, warehouses) => {
+                    if (err) {
+                        rej(err)
+                        return
+                    }
+                    if (!warehouses[0]) {
+                        res(null)
+                        return
+                    }
+                    factory(db)
+                        .getItemsByWarehouseId(warehouseId)
+                        .then(items => {
+                            const warehouse = {
+                                ...warehouses[0],
+                                items
+                            }
+                            res(warehouse)
+                        })
+                        .catch(rej)
+                })
+        }),
+    getItemsByWarehouseId: warehouseId =>
         new Promise((res, rej) => {
             db()
                 .collection('inventory')
-                .insertOne({ _id: new ObjectID(), ...item }, (err, item) => {
-                    err ? rej(err) : res(item)
+                .find({ warehouseId })
+                .toArray((err, items) => {
+                    err ? rej(err) : res(items)
                 })
+        }),
+    getOrdersByWarehouseId: warehouseId =>
+        new Promise((res, rej) => {
+            db()
+                .collection('orders')
+                .find({ warehouseId })
+                .toArray((err, items) => {
+                    err ? rej(err) : res(items)
+                })
+        }),
+    addItem: item =>
+        new Promise((res, rej) => {
+            if (!item._id) {
+                item = { _id: new ObjectID(), ...item }
+                db()
+                    .collection('inventory')
+                    .insertOne(item, (err, result) => {
+                        err ? rej(err) : res(item)
+                    })
+            } else {
+                db()
+                    .collection('inventory')
+                    .updateOne({ _id: item._id }, { $set: item }, (err, count_modified) => {
+                        if (err) {
+                            rej(err)
+                        } else if (count_modified === 0) {
+                            res(null)
+                        } else {
+                            console.log('count_modified:', count_modified)
+                            res(item)
+                        }
+                    })
+            }
         }),
     removeItem: item =>
         new Promise((res, rej) => {
             db()
                 .collection('inventory')
-                .deleteOne({ _id: new ObjectID(item._id) }, (err, item) => {
+                .deleteOne({ _id: item._id }, (err, item) => {
                     err ? rej(err) : res(item)
                 })
         }),
-    getItems: () =>
+    createUser: (username, type) =>
         new Promise((res, rej) => {
-            db()
-                .collection('inventory')
-                .find({})
-                .toArray((err, items) => {
-                    err ? rej(err) : res(items)
-                })
-        }),
-    createUser: (uname, pass) =>
-        new Promise((res, rej) => {
+            const user = { _id: new ObjectID(), username, type }
             db()
                 .collection('users')
-                .insertOne({ _id: new ObjectID(), username: uname, password: pass }, (err, user) => {
+                .insertOne(user, (err, result) => {
                     err ? rej(err) : res(user)
                 })
         }),
-    authUser: (uname, pass) =>
+    authUser: username =>
         new Promise((res, rej) => {
             db()
                 .collection('users')
-                .find({ username: uname, password: pass })
+                .find({ username })
                 .toArray((err, users) => {
                     console.log(users)
-                    err ? rej(err) : res(users.length > 0)
+                    if (err) {
+                        rej(err)
+                        return
+                    }
+                    res(users[0] || null)
                 })
         })
 })
