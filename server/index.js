@@ -4,6 +4,7 @@ const db = require('./db')
 const model = require('./model')
 const bonjour = require('bonjour')()
 const utils = require('./utils')
+const cors = require('cors')
 
 const PORT = process.env.PORT || 9000
 
@@ -15,7 +16,12 @@ const app = express()
 
 app.use(bodyParser.json())
 
-app.use(express.static('public'))
+app.use(express.static('../website/dist'))
+
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 
 //Logs all requests.
 app.use((req, res, next) => {
@@ -135,4 +141,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}.`)
 })
+//assis10t._http._tcp.
 bonjour.publish({ name: 'assis10t', type: 'http', host: utils.getIp(), port: PORT })

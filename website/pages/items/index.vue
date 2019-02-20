@@ -51,7 +51,8 @@
 </template>
 
 <script>
-import firebase, {auth} from '~/services/fireinit'
+// import firebase, {auth} from '~/services/fireinit'
+import axios from 'axios'
 
 export default {
     data: function () {
@@ -61,14 +62,23 @@ export default {
     },
     methods: {
         getItems: function () {
-            firebase.firestore().collection("items").get().then((querySnapshot) => {
-                this.items = []
-                querySnapshot.forEach((doc) => {
-                    let item = doc.data()
-                    item._id = doc.id
-                    this.items.push(item)
-                });
-            });
+            axios.
+                get('/items')
+                .then((res) => {
+                    this.items = res.items
+                    console.log(res)
+                })
+                .catch(function (res) {
+                    console.log(res)
+                })
+            // firebase.firestore().collection("items").get().then((querySnapshot) => {
+            //     this.items = []
+            //     querySnapshot.forEach((doc) => {
+            //         let item = doc.data()
+            //         item._id = doc.id
+            //         this.items.push(item)
+            //     });
+            // });
         }
     },
     mounted: function () {

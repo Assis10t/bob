@@ -2,7 +2,7 @@
     <section class="is-medium is-full-height">
         <div class="container is-flex justify-center align-center is-full-height">
             <div class="box">
-                <h2>Add an item</h2>
+                <h2>Add an item {{ ip }}</h2>
                 <form action="">
                     <div class="field">
                         <label class="label">Name:</label>
@@ -37,7 +37,8 @@
 </template>
 
 <script>
-import firebase, {auth} from '~/services/fireinit'
+// import firebase, {auth} from '~/services/fireinit'
+import axios from 'axios'
 
 export default {
     data: function () {
@@ -45,22 +46,48 @@ export default {
             name: null,
             qty: null,
             shelf: null,
+            ip: null
         }
     },
     methods: {
         addItem: function () {
-            firebase.firestore().collection("items").add({
-                name: this.name,
-                qty: this.qty,
-                shelf: this.shelf,
-            })
-            .then(function(docRef) {
-                console.log("Document written with ID: ", docRef.id);
-            })
-            .catch(function(error) {
-                console.error("Error adding document: ", error);
-            });
-        }
+            axios.
+                post('http://localhost:9000/items/', {
+                    name: this.name,
+                    qty: this.qty,
+                    shelf: this.shelf,
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(function(docRef) {
+                    console.log("Document written with ID: ", docRef);
+                })
+                .catch(function(error) {
+                    console.error("Error adding document: ", error);
+                });
+            
+            // firebase.firestore().collection("items").add({
+            //     name: this.name,
+            //     qty: this.qty,
+            //     shelf: this.shelf,
+            // })
+            // .then(function(docRef) {
+            //     console.log("Document written with ID: ", docRef.id);
+            // })
+            // .catch(function(error) {
+            //     console.error("Error adding document: ", error);
+            // });
+        },
+        // async fetchSomething() {
+        //     const ip = await this.$axios.$get('http://icanhazip.com')
+        //     this.ip = ip
+        // }
+    },
+    mounted: function () {
+        // this.fetchSomething()
+        console.log('opa')
     }
 };
 </script>
