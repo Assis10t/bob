@@ -1,25 +1,26 @@
 <template>
-    <section class="hero is-medium is-primary is-bold">
-        <div class="hero-body">
-            <div class="container">
-                <h1 class="title">
-                    Meet the Bob {{ user }}
-                </h1>
-                <h2 class="subtitle">
-                    Brilliant Online Buying
-                </h2>
-            </div>
-        </div>
-    </section>
+
+    <hero 
+        :slides="[
+            {
+                title: 'Meet the Bob',
+                short_description: 'Bob (Brilliant Online Buying) is a shopping assistant robot designed to help you.',
+                
+            }
+        ]"
+        :is_carousel="false"
+        :has_icon="true"
+    ></hero> 
+
 </template>
 
 <script>
-// import Logo from "~/components/Logo.vue";
+import Hero from "~/components/Hero.vue";
 
 export default {
-//   components: {
-//     Logo
-//   }
+    components: {
+        Hero
+    },
     data: function () {
         return {
 
