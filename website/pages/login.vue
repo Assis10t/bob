@@ -1,64 +1,91 @@
 <template>
-    <section class="is-medium is-full-height">
-        <div class="container is-flex justify-center align-center is-full-height">
-            <div class="box">
-                <form action="">
-                    <div class="field">
-                        <label class="label">Email:</label>
-                        <div class="control">
-                            <input class="input" type="email" v-model="email" placeholder="Enter your email">
+    <div>
+        <page-title
+            title="Login to your account"
+        ></page-title>
+
+        <section class="section">
+            <div class="container is-flex justify-center">
+                <div class="box third-width p30 pl50 pr50">
+                    <form action="">
+                        <div class="field">
+                            <label class="label">Username:</label>
+                            <div class="control">
+                                <input class="input" type="text" placeholder="Enter your full name" v-model="username">
+                            </div>
                         </div>
-                        <!-- <p class="help">This is a help text</p> -->
-                    </div>
-                    <div class="field">
-                        <label class="label">Password:</label>
-                        <div class="control">
-                            <input class="input" type="password" v-model="password" placeholder="Enter your password">
+                        <!-- <div class="field">
+                            <label class="label">Password:</label>
+                            <div class="control">
+                                <input class="input" type="password" v-model="password" placeholder="Enter your password">
+                            </div>
+                        </div> -->
+                        <!-- <div class="field">
+                            <label class="label">Confirm password:</label>
+                            <div class="control">
+                                <input class="input" type="password" v-model="password" placeholder="Confirm your password">
+                            </div>
+                        </div> -->
+                        <div class="field">
+                            <div class="control pt30">
+                                <a 
+                                    href="javascript:;"
+                                    class="button is-link" 
+                                    :disabled="!username"
+                                    @click.stop.prevent="login()">
+                                    <span>Login</span>
+                                </a>
+                            </div>
                         </div>
-                        <!-- <p class="help">This is a help text</p> -->
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <input type="submit" class="button is-link" value="Login"  @click.stop.prevent="login()">
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 </template>
 
 <script>
-import firebase, {auth} from '~/services/fireinit'
+import PageTitle from '~/components/PageTitle'
+import axios from 'axios'
 
 export default {
+    components: {
+        PageTitle
+    },
     data: function () {
         return {
             email: null,
-            password: null
+            username: null,
+            password: null,
+            type: 'merchant',
         }
     },
     methods: {
         login () {
-            // this.$store.dispatch('logIn').then(() => {
-            //     location.reload()
-            // }).catch((e) => {
-            //     console.log(e.message)
-            // })
-
-            firebase.auth().signInWithEmailAndPassword(this.email, this.password)
-                .then((res) => {
-                    console.log(res)
-                    this.$store.commit('setUser', res.user)
-                })
-                .catch(function(error) {
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                console.log(error.code)
-                console.log(error.message)
-            });
-
-            console.log(this.$store.state.user)
+            if (this.username) {
+                axios.
+                    post('http://localhost:9000/login/', {
+                        username: this.username,
+                        // password: this.password,
+                        // type: this.type,
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then((res) => {
+                        this.$store.commit('setUser', res.data.user)
+                        this.$cookies.set('user', res.data.user)
+                        console.log("Server response: ", res);
+    
+                        if (res.status == 200) {
+                            this.$router.push('/merchant/orders').go(1)
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error("Error adding document: ", error);
+                    });
+            }
         }
     }
 };
@@ -66,7 +93,5 @@ export default {
 
 <style lang="sass" scoped>
 
-    .box
-        width: 32rem    
 
 </style>

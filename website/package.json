@@ -21,6 +21,7 @@
     "node-sass": "^4.11.0",
     "nuxt": "^2.3.4",
     "sass-loader": "^7.1.0",
+    "vue-cookies": "^1.5.12",
     "vue-headroom": "^0.9.0"
   },
   "devDependencies": {

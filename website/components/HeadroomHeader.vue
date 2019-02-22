@@ -2,10 +2,7 @@
     <headroom 
         :disabled="disabled" 
         :style="[(project != undefined) ? {transform: 'none !important'} : {}]"
-        :class="{'is-transparent': isActive(homepage_url), 'is-sticked': project != undefined, 'menu-open': openedMenu}"
-        
-        :onNotTop="showProjectInfo"
-        :onTop="hideProjectInfo">
+        :class="{'is-transparent': isActive(homepage_url), 'is-sticked': project != undefined, 'menu-open': openedMenu}">
         <header>
             <nav 
                 class="navbar" 
@@ -49,7 +46,10 @@
                             </nuxt-link>    
                         </div>
 
-                        <div class="navbar-item ml30">
+                        <!-- <div class="navbar-item ml30">
+                            {{ user }}
+                        </div> -->
+                        <div class="navbar-item ml30" v-if="!isAuth">
                             <nuxt-link 
                                 to="/login" 
                                 class="button is-primary is-outlined is-smallish">
@@ -57,14 +57,55 @@
                                 <span>Login</span>
                             </nuxt-link>
                         </div>
-
-                        <div class="navbar-item">
+                        <div class="navbar-item" v-if="!isAuth">
                             <nuxt-link 
                                 to="/register" 
                                 class="navbar-link">
 
                                 <span>Register</span>
                             </nuxt-link>
+                        </div>
+
+                        <div class="navbar-item ml50" v-if="isAuth">
+                            <nuxt-link 
+                                to="/merchant/orders" 
+                                class="navbar-link">
+
+                                <span>Orders</span>
+                            </nuxt-link>
+                        </div>
+                        <div class="navbar-item" v-if="isAuth">
+                            <nuxt-link 
+                                to="/merchant/robot" 
+                                class="navbar-link">
+
+                                <span>Robot</span>
+                            </nuxt-link>
+                        </div>
+                        <div class="navbar-item" v-if="isAuth">
+                            <nuxt-link 
+                                to="/merchant/warehouses" 
+                                class="navbar-link">
+
+                                <span>Warehouses</span>
+                            </nuxt-link>
+                        </div>
+                        <div class="navbar-item" v-if="isAuth">
+                            <nuxt-link 
+                                to="/merchant/items" 
+                                class="navbar-link">
+
+                                <span>Items</span>
+                            </nuxt-link>
+                        </div>
+                        <div class="navbar-item" v-if="isAuth">
+                            <a 
+                                href="Javascript:;" 
+                                class="button is-primary is-outlined is-smallish"
+                                @click="logout()">
+
+                                <span><i class="mdi mdi-logout"></i></span>
+                            </a>
                         </div>
 
                         <div class="navbar-item">
@@ -106,15 +147,6 @@ export default {
         toggleMenu: function () {
             this.openedMenu = !this.openedMenu
         },
-        toggleDropdown: function (i) {
-            if (this.openedMenu) {
-                Vue.set(this.expands, i, !this.expands[i])
-                if (this.last_expand != i) {
-                    Vue.set(this.expands, this.last_expand, false)
-                    this.last_expand = i
-                }
-            }
-        },
         isActive: function (url) {
             // console.log(url, location.pathname, location.href)
             // if (url + '/' == location.href) {
@@ -122,21 +154,23 @@ export default {
             // }
             // return location.href == url
         },
-        showProjectInfo: function () {
-            if (this.project) {
-                this.showProject = true
-            }
-        },
-        hideProjectInfo: function () {
-            if (this.project) {
-                this.showProject = false
-            }
-        },
+
+        logout: function () {
+            this.$store.commit('unsetUser')
+            this.$cookies.remove('user')
+            this.$router.push('/').go(1)
+        }
     },
     computed: {
         homepage_url: function () {
             return this.home_url ? this.home_url : this.links[0].url
         },
+        user: function () {
+            return this.$store.state.user
+        },
+        isAuth: function () {
+            return this.$store.state.user != null
+        }
     },
     watch: {
         recieved_project: function (nv, ov) {
@@ -144,7 +178,7 @@ export default {
         }
     },
     mounted: function () {
-        
+        this.$store.commit('getUserFromSession')
     }
 }
 </script>

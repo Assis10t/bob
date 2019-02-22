@@ -12,8 +12,18 @@
                         <div class="field">
                             <label class="label">Username:</label>
                             <div class="control">
-                                <input class="input" type="text" placeholder="Enter your full name">
+                                <input 
+                                    :class="[
+                                        'input', 'is-' + message.status
+                                    ]" 
+                                    type="text" 
+                                    placeholder="Enter your full name" v-model="username">
                             </div>
+                            <p :class="[
+                                'help', 'is-' + message.status
+                            ]">
+                                {{ message.text }}
+                            </p>
                         </div>
                         <!-- <div class="field">
                             <label class="label">Password:</label>
@@ -29,7 +39,11 @@
                         </div> -->
                         <div class="field">
                             <div class="control pt30">
-                                <a class="button is-link" value="Register" @click.stop.prevent="register()">
+                                <a 
+                                    href="javascript:;"
+                                    class="button is-link" 
+                                    :disabled="!username"
+                                    @click.stop.prevent="register()">
                                     <span>Sign up</span>
                                 </a>
                             </div>
@@ -52,36 +66,47 @@ export default {
     data: function () {
         return {
             email: null,
+            username: null,
             password: null,
             type: 'merchant',
+            message: {
+                status: null,
+                text: null
+            }
         }
     },
     methods: {
         register () {
-            axios.
-                post('http://localhost:9000/register/', {
-                    username: this.name,
-                    // password: this.password,
-                    type: this.type,
-                }, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
-                .then(function(res) {
-                    console.log("Server response: ", res);
-                })
-                .catch(function(error) {
-                    console.error("Error adding document: ", error);
-                });
-            // firebase.auth().createUserWithEmailAndPassword(this.email, this.password).catch(function(error) {
-            //     var errorCode = error.code;
-            //     var errorMessage = error.message;
-            //     console.log(error.code)
-            //     console.log(error.message)
-            // });
+            if (this.username) {
+                axios.
+                    post('http://localhost:9000/register/', {
+                        username: this.username,
+                        // password: this.password,
+                        type: this.type,
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then((res) => {
+                        this.$store.commit('setUser', res.data.user)
+                        this.$cookies.set('user', res.data.user)
+                        console.log("Server response: ", res);
 
-            console.log(this.$store.state.user)
+                        this.message.status = res.status == 200 ? 'success' : 'danger'
+                        this.message.text = 'You have successfully created your account!'
+
+                        if (this.message.status == 200) {
+                            this.$router.push('/merchant/orders').go(1)
+                        }
+                    })
+                    .catch((error) => {
+                        this.message.status = 'danger'
+                        this.message.text = 'There has been an error. Your profile was not created.'
+
+                        console.error("Error adding document: ", error);
+                    });
+            }
         }
     }
 };

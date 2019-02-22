@@ -11,6 +11,12 @@ export const mutations = {
     },
     setUser (state, payload) {
         state.user = payload
+    },
+    unsetUser (state) {
+        state.user = null
+    },
+    getUserFromSession (state) {
+        state.user = window.$nuxt.$cookies.get('user')
     }
 
     // signUpWithEmail ({commit}) {

@@ -15,7 +15,8 @@ module.exports = {
       { hid: 'description', name: 'description', content: pkg.description }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', type: 'text/css', href: '//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css' }
     ]
   },
 
@@ -39,6 +40,7 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    '@/plugins/vue-cookies.js'
   ],
 
   /*
@@ -59,7 +61,7 @@ module.exports = {
   ** Build configuration
   */
   build: {
-    vendor: ['axios'],
+    vendor: ['axios', 'vue-cookies'],
     postcss: {
       preset: {
         features: {

@@ -10,19 +10,19 @@
                 },
                 {
                     name: 'Meet the Bob',
-                    url: '/'
+                    url: '/meet-bob'
                 },
                 {
                     name: 'Bob App',
-                    url: '/'
+                    url: '/bob-app'
                 },
                 {
                     name: 'About',
-                    url: '/'
+                    url: '/about'
                 },
                 {
                     name: 'Contact us',
-                    url: '/'
+                    url: '/contacts'
                 },
             ]"
         >
