@@ -14,30 +14,20 @@ module.exports = () => {
 
 const model = require('./model')
 
-module.exports.init = () => {
+module.exports.init = async () => {
     client = new MongoClient(mongo_url, {
         useNewUrlParser: true
     })
-    return new Promise((res, rej) => {
-        client.connect(function(err) {
-            if (err) {
-                rej(err)
-                return
-            }
-            db = client.db('bob')
-            //FOR DEMO 1
-
-            db.collection('bob_movement').insertOne({ _id: 'movement', moving: false, markers: 1 }, (err, doc) => {
-                if (err) {
-                    console.log('Movment already in database')
-                    model
-                        .turnOff()
-                        .then(() => console.log('Robot Stopped'))
-                        .catch(err => console.error(err))
-                }
-            })
-            res(db)
-            //console.log(`Initialized database connection on ${mongo_url}.`)
-        })
-    })
+    await client.connect()
+    db = client.db('bob')
+    try {
+        await db.collection('bob_movement').insertOne({ _id: 'movement', moving: false, markers: 1 })
+    } catch (err) {
+        console.log('Movment already in database')
+        await model
+            .turnOff()
+            .then(() => console.log('Robot Stopped'))
+            .catch(err => console.error(err))
+    }
+    return db
 }
