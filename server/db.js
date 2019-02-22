@@ -19,15 +19,12 @@ module.exports.init = async () => {
         useNewUrlParser: true
     })
     await client.connect()
-    db = client.db
+    db = client.db('bob')
     try {
-        await db
-            .collection('bob_movement')
-            .insertOne({ _id: 'movement', moving: false, markers: 1 })
-            .catch(err => {})
+        await db.collection('bob_movement').insertOne({ _id: 'movement', moving: false, markers: 1 })
     } catch (err) {
         console.log('Movment already in database')
-        model
+        await model
             .turnOff()
             .then(() => console.log('Robot Stopped'))
             .catch(err => console.error(err))
