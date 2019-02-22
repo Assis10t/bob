@@ -12,7 +12,7 @@
                 role="navigation" aria-label="main navigation">
                 <div class="navbar-brand">
                     <a class="navbar-item" :href="homepage_url">
-                        <img src="~/assets/images/logo.svg">
+                        <img src="~/assets/images/bob-logo-new.svg">
                     </a>
 
                     <transition name="slide-top" mode="out-in" v-if="project">

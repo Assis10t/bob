@@ -13,6 +13,10 @@
                     url: '/'
                 },
                 {
+                    name: 'Bob App',
+                    url: '/'
+                },
+                {
                     name: 'About',
                     url: '/'
                 },
