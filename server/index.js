@@ -157,24 +157,28 @@ app.post('/login', (req, res, next) => {
             else res.status(401).json({ success: false, error: 'Username or password is incorrect.' })
         })
 })
-app.post('/robotcommand/:robotid', (req,res,next) => {
+//add robot get
+
+// add get all robots
+
+app.post('/robot/:robotid/sethome', (req,res,next) => {
     model
         .setHome(req.params.robotid, req.body.home_x, req.body.home_y)
         .then(robot => res.json({success: true, robot}))
         .catch(next)
 })
-app.post('/robotcommand', (req,res,next) => {
+app.post('/robot', (req,res,next) => {
     model
         .addRobot(req.body._id, req.body.home_x, req.body.home_y)
         .then(robot => res.json({success: true, robot}))
         .catch(next)
 })
-app.get('/robotcommand/getnextjob',(req,res,next) => {
+app.get('/robot/getnextjob', auth.robot((req,res,next) => {
     model 
         .getNextJob(req.body.robot_id)
         .then(job => res.json({success:true, job}))
         .catch(next)
-})
+}))
 
 //Logs all responses.
 app.use((req, res, next) => {
