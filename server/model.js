@@ -152,40 +152,31 @@ const factory = db => ({
                     err ? rej(err) : res(robot)
                 });
         }),
-    // TODO: add promises to prevent mega intentation
     getNextJob: (robot_id) =>
         new Promise((res,rej) => {
-            db()
-                .collection('orders')
-                .find({"status":"PENDING"})
-                .toArray((err, orders) => {
-                    const order_id = orders[0]["_id"]
-                    console.log(order_id)
-                    if (err) {
-                        rej(err)
-                    } else {
-                        db().collection('robot')
-                        .find({"_id":robot_id})
-                        .toArray((err,robot) => {
-                            
-                            if (err) {
-                                rej(err)
-                            } else {
-                                db()
-                                    .collection('warehouse')
-                                    // TODO implement warehouseID
-                                    .find({})
-                                    .toArray((err,warehouse) => {
-                                        db()
-                                            .collection('orders')
-                                            .updateOne({"_id":order_id}, {$set:{"status":"IN_TRANSIT"}})
-                                            res(robotPathfinding.get_robot_path(orders[0],robot[0],warehouse[0]))   
-                                    })
-                            }
+            db().collection('robot')
+            .find({"_id":robot_id})
+            .toArray((err,robot) => {
+                if (err) {
+                    rej(err)
+                } else {
+                    db()
+                        .collection('warehouse')
+                        .find({})
+                        .toArray((err,warehouse) => {
+                            db()
+                                .collection('orders')
+                                .updateOne({"status":"PENDING"}, {$set:{"status":"IN_TRANSIT"}}, (err, order) => {
+                                    console.log(err)
+                                    if (err) {
+                                        rej(err)
+                                    } else {
+                                        res(robotPathfinding.get_robot_path(order,robot[0],warehouse[0]))   
+                                    }
+                                })          
                         })
-                        
-                    }
-                })
+                }
+            })
         })
 })
 
