@@ -155,8 +155,8 @@ const factory = db => ({
     getNextJob: (robot_id) =>
         new Promise((res,rej) => {
             db().collection('robot')
-            .find({"_id":robot_id})
-            .toArray((err,robot) => {
+            .findOne({"_id":robot_id})
+            .then((err,robot) => {
                 if (err) {
                     rej(err)
                 } else {
