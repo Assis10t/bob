@@ -2,5 +2,5 @@ package io.github.assis10t.bobandroid.pojo
 
 class RegisterRequest (
     val username: String,
-    val password: String
+    val type: User.Companion.UserType = User.Companion.UserType.CUSTOMER
 )

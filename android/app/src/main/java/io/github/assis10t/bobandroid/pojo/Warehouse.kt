@@ -1,5 +1,15 @@
 package io.github.assis10t.bobandroid.pojo
 
-class Warehouse {
-    //TODO: Implement when API v2 is decided on.
+class Warehouse (
+    val _id: String? = null,
+    val merchantId: String? = null,
+    val location: Location? = null,
+    val items: List<Item>? = null
+) {
+    companion object {
+        class Location(
+            latitude: Double = 0.0,
+            longitude: Double = 0.0
+        )
+    }
 }
