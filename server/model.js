@@ -159,6 +159,8 @@ const factory = db => ({
                 .collection('orders')
                 .find({"status":"PENDING"})
                 .toArray((err, orders) => {
+                    const order_id = orders[0]["_id"]
+                    console.log(order_id)
                     if (err) {
                         rej(err)
                     } else {
@@ -174,9 +176,11 @@ const factory = db => ({
                                     // TODO implement warehouseID
                                     .find({})
                                     .toArray((err,warehouse) => {
-                                        res(robotPathfinding.get_robot_path(orders[0],robot[0],warehouse[0]))   
+                                        db()
+                                            .collection('orders')
+                                            .updateOne({"_id":order_id}, {$set:{"status":"IN_TRANSIT"}})
+                                            res(robotPathfinding.get_robot_path(orders[0],robot[0],warehouse[0]))   
                                     })
-                                
                             }
                         })
                         
