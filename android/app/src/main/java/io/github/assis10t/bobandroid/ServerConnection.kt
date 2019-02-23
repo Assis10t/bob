@@ -163,6 +163,27 @@ class ServerConnection {
     }
     val getWarehouse = getWarehouseFactory(httpClient, Gson())
 
+    //Requires login
+    val getOrdersFactory = { http: OkHttpClient, gson: Gson ->
+        { context: Context, onGetOrders: (error: Exception?, orders: List<Order>?) -> Unit ->
+            connect {server ->
+                if (!isLoggedIn(context)) {
+                    onGetOrders(Exception("This operation requires authentication."), null)
+                    return@connect
+                }
+                getRequestWithAuthFactory(http, gson)("$server/order", getCurrentUsername(context)!!) { error, str ->
+                    if (error != null) {
+                        onGetOrders(error, null)
+                    } else {
+                        val response = gson.fromJson(str, GetOrdersResponse::class.java)
+                        onGetOrders(null, response.orders)
+                    }
+                }
+            }
+        }
+    }
+    val getOrders = getOrdersFactory(httpClient, Gson())
+
     // Requires login
     val makeOrderFactory = { http: OkHttpClient, gson: Gson ->
         { context: Context, order: Order, onOrderComplete: ((error: Exception?) -> Unit)? ->
