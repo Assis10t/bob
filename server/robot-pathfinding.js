@@ -21,12 +21,10 @@ makeWarehouse = (width,height) => {
             walkable_grid[s*2+1][i] = 1;
         }
     }
-    console.log("grid: " + walkable_grid);
     return walkable_grid;
 }
 
 pathfind_to_point = (current_pos,end_pos, warehouse_grid) => {
-    console.log(warehouse_grid)
     var pf_grid = new PF.Grid(warehouse_grid);
     var finder = new PF.AStarFinder();
     var path = finder.findPath(current_pos[0],current_pos[1], end_pos[0], end_pos[1], pf_grid);
@@ -96,9 +94,8 @@ convert_order_to_job = (order,robot,warehouse_grid) => {
         var item_xy = [current_item["x"],current_item["y"]*2,robot_pos["z"]]
 
         var path = pathfind_to_point(robot_xy, item_xy,warehouse_grid);
-        console.log(path)
-        if (path  == []) {
-            console.log("Unable to find path to " + item_xy);
+        if (path  == [] || path == undefined) {
+            return {}
         } 
         //go to position and grab
         for (var p = 1; p < path.length; p++) {
@@ -114,11 +111,11 @@ convert_order_to_job = (order,robot,warehouse_grid) => {
         }
         job["instruction_set"].push(generate_drop_instruction())
     }
-    console.log(job)
+    
     return job
 }
 module.exports.get_robot_path = (order,robot,warehouse) => {
     var warehouse_dims = warehouse["dimensions"]
     var warehouse_grid = makeWarehouse(warehouse_dims["x"],warehouse_dims["y"],)
-    convert_order_to_job(order,robot,warehouse_grid)
+    return convert_order_to_job(order,robot,warehouse_grid)
 }
