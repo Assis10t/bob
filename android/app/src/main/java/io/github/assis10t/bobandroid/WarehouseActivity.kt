@@ -10,11 +10,15 @@ import android.view.*
 import android.widget.TextView
 import io.github.assis10t.bobandroid.pojo.Item
 import io.github.assis10t.bobandroid.pojo.Order
+import io.github.assis10t.bobandroid.pojo.Warehouse
 import kotlinx.android.synthetic.main.activity_warehouse.*
 import timber.log.Timber
 
 
 class WarehouseActivity : AppCompatActivity() {
+
+    lateinit var warehouseId: String
+    var warehouse: Warehouse? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,9 +42,13 @@ class WarehouseActivity : AppCompatActivity() {
             container.isRefreshing = true
             make_order.hide()
             val adapter = item_list.adapter as ItemAdapter
-            ServerConnection().makeOrder(Order(null, adapter.selectedItems)) { success ->
-                if (!success)
-                    Timber.e("Could not make order.")
+            val order = Order.Factory()
+                .items(adapter.selectedItems)
+                .warehouseId(warehouseId)
+                .build()
+            ServerConnection().makeOrder(this, order) { err ->
+                if (err != null)
+                    Timber.e("Could not make order. $err")
                 else {
                     Timber.d("Order made.")
                     refreshItems()
@@ -57,15 +65,21 @@ class WarehouseActivity : AppCompatActivity() {
 
     fun refreshItems() {
         container.isRefreshing = true
-        ServerConnection().getItems { success, items ->
+        ServerConnection().getWarehouse(warehouseId) { err, warehouse ->
             container.isRefreshing = false
-            if (!success) {
-                Timber.e("getItems failed.")
-                return@getItems
+            if (err != null) {
+                Timber.e("getWarehouse failed. $err")
+                return@getWarehouse
             }
-            Timber.d("GetItems success. Items: ${items?.size}")
+            if (warehouse == null) {
+                Timber.e("Warehouse $warehouseId not found.")
+                return@getWarehouse
+            }
+            this.warehouse = warehouse
+            val items = warehouse.items!!
+            Timber.d("GetWarehouse success. Items: ${items.size}")
             val adapter = item_list.adapter as ItemAdapter
-            adapter.updateItems(items!!)
+            adapter.updateItems(items)
         }
     }
 

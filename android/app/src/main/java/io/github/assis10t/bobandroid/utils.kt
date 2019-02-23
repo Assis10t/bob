@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.TypedValue
 import android.provider.SyncStateContract.Helpers.update
 import java.security.NoSuchAlgorithmException
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 fun dp(context: Context, dp: Float) =
@@ -33,4 +35,9 @@ fun md5(s: String): String {
     }
 
     return ""
+}
+
+fun getCurrentTimeString(): String {
+    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.UK)
+    return sdf.format(Date())
 }

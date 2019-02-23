@@ -4,6 +4,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import io.github.assis10t.bobandroid.pojo.User
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.toast
 
@@ -19,13 +20,11 @@ class LoginActivity : AppCompatActivity() {
 
         login_button.setOnClickListener {
             ServerConnection().login(
-                username.text.toString(),
-                md5(password.text.toString())
-            ) { success, loggedIn ->
-                if (!success) {
+                this,
+                username.text.toString()
+            ) { err, user ->
+                if (err != null) {
                     toast("An error occured while logging in.")
-                } else if (!loggedIn) {
-                    toast("Wrong username or password.")
                 } else {
 //                    val intent = Intent(this, WarehouseActivity::class.java)
 //                    intent.putExtra("loggedIn", true)
@@ -37,10 +36,10 @@ class LoginActivity : AppCompatActivity() {
 
         register_button.setOnClickListener {
             ServerConnection().register(
-                username.text.toString(),
-                md5(password.text.toString())
-            ) { success ->
-                if (!success) {
+                this,
+                username.text.toString()
+            ) { err, user ->
+                if (err != null) {
                     toast("An error occured while registering.")
                 } else {
 //                    val intent = Intent(this, WarehouseActivity::class.java)
