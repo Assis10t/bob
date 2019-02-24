@@ -80,7 +80,9 @@ generate_movement_instruction = (start,end) => {
     }
 }
 convert_order_to_job = (order,robot,warehouse_grid) => {
-    
+    if (order == undefined) {
+        return {}
+    }
     var robot_pos = robot["location"]
     var item_list = order["items"]
     

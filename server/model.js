@@ -85,6 +85,8 @@ const factory = db => ({
             .collection('users')
             .insertOne(user)
             .then(() => user)
+        
+    
     },
     authUser: username =>
         db()
@@ -98,6 +100,22 @@ const factory = db => ({
                 err ? rej(err) : res(warehouse);
             });
     }),
+    getRobot: (robot_id) => {
+        return new Promise((res, rej) => {
+            db()
+                .collection('robot')
+                .find({_id:robot_id})
+                .toArray((err,robot) => {
+                    console.log(robot)
+                    console.log(err)
+                    if (err) {
+                        rej(err)
+                    } else {
+                        res(robot)
+                    }
+                })
+        })
+    },
     addRobot: (robot_id, home_x, home_y) =>
         new Promise((res,rej) => {
             db()
@@ -105,6 +123,7 @@ const factory = db => ({
                 .insertOne(
                             {   
                                 _id: robot_id, 
+                                status: 'WAITING',
                                 home_x:home_x,
                                 home_y:home_y,
                                 location: {
@@ -137,18 +156,26 @@ const factory = db => ({
                                     if (err) {
                                         rej(err)
                                     } else {
-                                        const robot_job = robotPathfinding.get_robot_path(orders[0],robot,warehouse[0])
+                                        //console.log(orders.length)
+                                        if (orders.length == 0) {
+                                            res([])
+                                        } else {
+                                            const robot_job = robotPathfinding.get_robot_path(orders[0],robot,warehouse[0])
                                         
-                                        db()
-                                            .collection('orders')
-                                            .updateOne({"_id":orders[0]._id},{$set:{"status":"IN_TRANSIT"}}, (err) => {
-                                                if (err) {
-                                                    rej(err)
-                                                } else {
-                                                    res(robot_job)
-                                                }
-                                            })
-                                            
+                                            db()
+                                                .collection('orders')
+                                                .updateOne({"_id":orders[0]._id},{$set:{"status":"IN_TRANSIT"}}, (err) => {
+                                                    if (err) {
+                                                        rej(err)
+                                                    } else {
+                                                        db()
+                                                            .collection('robot')
+                                                            .updateOne({"_id":robot_id}, {'$set':{'status':'ON_JOB'}})
+                                                            .then(() => res(robot_job))
+                                                       
+                                                    }
+                                                })
+                                        }       
                                     }
                                 })          
                         })

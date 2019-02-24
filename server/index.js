@@ -137,7 +137,16 @@ app.get('/getmovement', (req, res, next) => {
 app.post('/register', (req, res, next) => {
     model
         .createUser(req.body.username, req.body.type)
-        .then(user => res.json({ success: true, user }))
+        .then(user => {
+            if (req.body.type == 'robot') {
+                model
+                    .addRobot(user.username, 0,0)
+                    .then(res.json({ success: true, user}))
+                    .catch(next)
+            } else {
+                res.json({ success: true, user })
+            }
+        })
         .catch(next)
 })
 app.post('/login', (req, res, next) => {
@@ -148,25 +157,38 @@ app.post('/login', (req, res, next) => {
             else res.status(401).json({ success: false, error: 'Username or password is incorrect.' })
         })
 })
-//add robot get
+app.get('/robot', auth.robot((req,res,next) => {
+    var currentUser = req.user
+    model
+        .getRobot(currentUser.username)
+        .then(robot => res.json({success: true, robot}))
+        .catch(next)
+}))
 
-// add get all robots
-
-app.post('/robot/:robotid/sethome', (req,res,next) => {
+app.get(
+    '/robot/:robotId',
+    auth.merchant((req, res, next) => {
+       model
+        .getRobot(req.params.robotId)
+        .then(robot => res.json({success:true,robot}))
+        .catch(next)
+    })
+)
+app.post('/robot/:robotid/sethome', auth.merchant((req,res,next) => {
     model
         .setHome(req.params.robotid, req.body.home_x, req.body.home_y)
         .then(robot => res.json({success: true, robot}))
         .catch(next)
-})
+}))
 app.post('/robot', (req,res,next) => {
     model
         .addRobot(req.body._id, req.body.home_x, req.body.home_y)
         .then(robot => res.json({success: true, robot}))
         .catch(next)
 })
-app.get('/robot/getnextjob', auth.robot((req,res,next) => {
+app.get('/robotjob', auth.robot((req,res,next) => {
     model 
-        .getNextJob(req.body.robot_id)
+        .getNextJob(req.user.username)
         .then(job => res.json({success:true, job}))
         .catch(next)
 }))
