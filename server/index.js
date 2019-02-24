@@ -180,12 +180,7 @@ app.post('/robot/:robotid/sethome', auth.merchant((req,res,next) => {
         .then(robot => res.json({success: true, robot}))
         .catch(next)
 }))
-app.post('/robot', (req,res,next) => {
-    model
-        .addRobot(req.body._id, req.body.home_x, req.body.home_y)
-        .then(robot => res.json({success: true, robot}))
-        .catch(next)
-})
+
 app.get('/robotjob', auth.robot((req,res,next) => {
     model 
         .getNextJob(req.user.username)
