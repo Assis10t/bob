@@ -22,12 +22,12 @@ const factory = db => ({
     turnOn: markers =>
         db()
             .collection('bob_movement')
-            .updateOne({ _id: 'movement' }, { $set: { moving: true, markers: parseInt(markers) } })
+            .updateOne({}, { $set: { moving: true, markers: parseInt(markers) } })
             .then(() => 'on'),
     turnOff: () =>
         db()
             .collection('bob_movement')
-            .updateOne({ _id: 'movement' }, { $set: { moving: false } })
+            .updateOne({}, { $set: { moving: false } })
             .then(() => 'off'),
     getMovement: () =>
         db()
@@ -38,10 +38,24 @@ const factory = db => ({
             .collection('warehouses')
             .find()
             .toArray(),
+    addWarehouse: warehouse => {
+        if (!warehouse._id) {
+            warehouse = { _id: new ObjectID(), ...warehouse }
+            return db()
+                .collection('warehouses')
+                .insertOne(warehouse)
+                .then(() => warehouse)
+        } else {
+            return db()
+                .collection('warehouses')
+                .updateOne({ _id: warehouse._id }, { $set: warehouse })
+                .then(modifiedCount => (modifiedCount ? warehouse : null))
+        }
+    },
     getWarehouseById: async warehouseId => {
         const warehouse = await db()
             .collection('warehouses')
-            .findOne({ _id: warehouseId })
+            .findOne({ _id: ObjectID(warehouseId) })
         if (!warehouse) return null
 
         const items = await factory(db).getItemsByWarehouseId(warehouseId)
@@ -70,14 +84,14 @@ const factory = db => ({
         } else {
             return db()
                 .collection('inventory')
-                .updateOne({ _id: item._id }, { $set: item })
+                .updateOne({ _id: ObjectID(item._id) }, { $set: item })
                 .then(modifiedCount => (modifiedCount ? item : null))
         }
     },
     removeItem: item =>
         db()
             .collection('inventory')
-            .deleteOne({ _id: item._id }),
+            .deleteOne({ _id: ObjectID(item._id) }),
     createUser: (username, type) => {
         const user = { _id: new ObjectID(), username, type }
         return db()
