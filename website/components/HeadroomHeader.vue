@@ -76,14 +76,6 @@
                         </div>
                         <div class="navbar-item" v-if="isAuth">
                             <nuxt-link 
-                                to="/merchant/robot" 
-                                class="navbar-link">
-
-                                <span>Robot</span>
-                            </nuxt-link>
-                        </div>
-                        <div class="navbar-item" v-if="isAuth">
-                            <nuxt-link 
                                 to="/merchant/warehouses" 
                                 class="navbar-link">
 

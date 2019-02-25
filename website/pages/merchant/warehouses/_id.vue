@@ -114,7 +114,6 @@
                                 <td>Quantity</td>
                                 <td>Unit</td>
                                 <td>Price</td>
-                                <td>View items</td>
                                 <td>Edit items</td>
                                 <td>Delete items</td>
                             </tr>
@@ -143,12 +142,6 @@
                                 </td>
 
                                 <td>
-                                    <nuxt-link :to="'/merchant/items/' + item._id" class="has-text-info">
-                                        <i class="mdi mdi-eye"></i>
-                                        View
-                                    </nuxt-link>
-                                </td>
-                                <td>
                                     <a href="#" class="has-text-success">
                                         <i class="mdi mdi-pencil"></i>
                                         Edit
@@ -163,6 +156,14 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <div class="is-flex justify-start align-center">
+                    <nuxt-link 
+                        :to="'/merchant/items/create/' + warehouseId" 
+                        class="button is-link">
+                        <span>Add an item to this warehouse</span>
+                    </nuxt-link>
+                    <nuxt-link to="/merchant/warehouses" class="is-inline-block ml20">Back to all warehouses</nuxt-link>
                 </div>
             </div>
         </section>

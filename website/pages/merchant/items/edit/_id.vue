@@ -3,7 +3,7 @@
         <section class="section pt60 pt30t pb0">
             <div class="container has-text-centered">
                 <h1 class="is-inline-block is-relative mb25">
-                    Add an item to {{ warehouse.name }}
+                    Add item
                 </h1>
             </div>
         </section>
@@ -122,19 +122,8 @@ export default {
     },
     data: function () {
         return {
-            warehouseId: this.$nuxt._route.params.id,
-            warehouse: {},
-
-            name: null,
-            image: null,
-            position: {
-                x: 0,
-                y: 0,
-                z: 0,
-            },
-            quantity: null,
-            unit: null,
-            price: null
+            itemId: this.$nuxt._route.params.id,
+            item: {}
         }
     },
     methods: {

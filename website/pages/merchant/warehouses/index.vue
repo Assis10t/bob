@@ -88,6 +88,11 @@ export default {
         }
     },
     methods: {
+        filterWarehouses: function (warehouses) {
+            return warehouses.filter((warehouse) => {
+                return warehouse.merchantId == this.$store.state.user._id
+            })
+        },
         getWarehouses () {
             axios.
                 get('http://localhost:9000/warehouse/', {
@@ -98,7 +103,7 @@ export default {
                 .then((res) => {
                     console.log("Server response: ", res);
 
-                    this.warehouses = res.data.warehouses
+                    this.warehouses = this.filterWarehouses(res.data.warehouses)
 
                     // if (res.status == 200) {
                     //     this.$router.push('/merchant/orders').go(1)
