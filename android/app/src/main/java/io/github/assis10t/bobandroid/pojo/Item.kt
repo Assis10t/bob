@@ -7,5 +7,6 @@ class Item (
     val image: String? = null,
     val position: Position? = null,
     val quantity: Double? = null,
-    val unit: String? = null
+    val unit: String? = null,
+    val price: Double = 0.0
 )

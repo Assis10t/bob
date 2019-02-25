@@ -82,11 +82,12 @@ class ServerConnection {
                     val request = Request.Builder().url(url).header("username",username).build()
                     val response = http.newCall(request).execute()
                     Timber.d("Response received.")
-                    val failResponse = gson.fromJson(response.body()!!.string(), FailResponse::class.java)
+                    val responseBody = response.body()?.string()!!
+                    val failResponse = gson.fromJson(responseBody, FailResponse::class.java)
                     if (!failResponse.success) {
-                        uiThread { onGetComplete(Exception(failResponse.error), response.body()?.string()) }
+                        uiThread { onGetComplete(Exception(failResponse.error), responseBody) }
                     } else {
-                        uiThread { onGetComplete(null, response.body()?.string()) }
+                        uiThread { onGetComplete(null, responseBody) }
                     }
                 } catch (e: IOException) {
                     Timber.e(e, "Get Request failed")
@@ -110,12 +111,13 @@ class ServerConnection {
                     val requestBody = RequestBody.create(JSON, gson.toJson(body))
                     val request = Request.Builder().header("username",username).url(url).post(requestBody).build()
                     val response = http.newCall(request).execute()
+                    val responseBody = response.body()?.string()!!
                     Timber.d("Response received.")
-                    val failResponse = gson.fromJson(response.body()!!.string(), FailResponse::class.java)
+                    val failResponse = gson.fromJson(responseBody, FailResponse::class.java)
                     if (!failResponse.success) {
-                        uiThread { onPostComplete(Exception(failResponse.error), response.body()?.string()) }
+                        uiThread { onPostComplete(Exception(failResponse.error), responseBody) }
                     } else {
-                        uiThread { onPostComplete(null, response.body()?.string()) }
+                        uiThread { onPostComplete(null, responseBody) }
                     }
                 } catch (e: IOException) {
                     Timber.e(e, "Post Request failed")

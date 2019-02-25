@@ -29,7 +29,8 @@ class LoginActivity : AppCompatActivity() {
 //                    val intent = Intent(this, WarehouseActivity::class.java)
 //                    intent.putExtra("loggedIn", true)
 //                    startActivity(intent)
-                    onBackPressed() //TODO: Replace with startActivityForResult logic.
+//                    onBackPressed() //TODO: Replace with startActivityForResult logic.
+                    finish()
                 }
             }
         }
@@ -53,7 +54,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == android.R.id.home) {
-            onBackPressed()
+            finish()
             return true
         } else {
             return super.onOptionsItemSelected(item)

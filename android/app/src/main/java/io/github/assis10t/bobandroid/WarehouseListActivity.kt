@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
@@ -55,7 +56,26 @@ class WarehouseListActivity : AppCompatActivity(), OnMapReadyCallback {
         behavior.skipCollapsed = false
 
         warehouse_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        warehouse_list.adapter = WarehouseAdapter(listOf(Warehouse(), Warehouse(), Warehouse())) //TODO: Remove dummy items
+        warehouse_list.adapter = WarehouseAdapter(listOf())
+        loading.visibility = View.GONE
+    }
+
+    override fun onStart() {
+        super.onStart()
+        refreshWarehouseList()
+    }
+
+    fun refreshWarehouseList() {
+        loading.visibility = View.VISIBLE
+        ServerConnection().getWarehouses {err, warehouses ->
+            if (err != null) {
+                Toast.makeText(this, err.message, Toast.LENGTH_SHORT).show()
+                return@getWarehouses
+            }
+            val adapter = warehouse_list.adapter as WarehouseAdapter
+            adapter.setItems(warehouses!!)
+            loading.visibility = View.GONE
+        }
     }
 
     /**
@@ -148,7 +168,13 @@ class WarehouseListActivity : AppCompatActivity(), OnMapReadyCallback {
         override fun getItemCount() = warehouseList.size
 
         override fun onBindViewHolder(vh: ViewHolder, pos: Int) {
-            //TODO: Fill items with information.
+            vh.title.text = warehouseList[pos].name
+            vh.description.text = "Supermarket"
+            vh.container.setOnClickListener {v ->
+                val intent = Intent(v.context, WarehouseActivity::class.java)
+                intent.putExtra("warehouseId", warehouseList[pos]._id)
+                v.context.startActivity(intent)
+            }
         }
 
         fun setItems(warehouseList: List<Warehouse>) {
@@ -159,6 +185,7 @@ class WarehouseListActivity : AppCompatActivity(), OnMapReadyCallback {
         fun getItems() = warehouseList
 
         class ViewHolder(v: View): RecyclerView.ViewHolder(v) {
+            val container: CardView = v.findViewById(R.id.container)
             val title: TextView = v.findViewById(R.id.title)
             val description: TextView = v.findViewById(R.id.description)
         }

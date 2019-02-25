@@ -1,5 +1,7 @@
 package io.github.assis10t.bobandroid.pojo
 
+import com.google.gson.Gson
+
 class Warehouse (
     val _id: String? = null,
     val name: String = "Unnamed Warehouse",
@@ -12,5 +14,9 @@ class Warehouse (
             latitude: Double = 0.0,
             longitude: Double = 0.0
         )
+
+        fun fromString(str: String) = Gson().fromJson(str, Warehouse::class.java)
     }
+
+    override fun toString() = Gson().toJson(this)
 }

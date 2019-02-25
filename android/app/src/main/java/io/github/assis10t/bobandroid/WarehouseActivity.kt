@@ -24,11 +24,9 @@ class WarehouseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_warehouse)
 
-        container.isRefreshing = true
-        container.setOnRefreshListener { refreshItems() }
-        ServerConnection().connect {
-            container.isRefreshing = false
-        }
+        warehouseId = intent.getStringExtra("warehouseId")
+
+        container.isEnabled = false
         item_list.layoutManager = GridLayoutManager(this, 2)
         item_list.adapter = ItemAdapter { selected ->
             if (selected.isEmpty())
@@ -113,6 +111,7 @@ class WarehouseActivity : AppCompatActivity() {
             val item = itemList[pos]
             val context = vh.container.context
             vh.title.text = item.name
+            vh.price.text = "£${item.price}/${item.unit?:"item"}"
             vh.container.setCardBackgroundColor(
                 if (selectedItems.contains(item))
                     vh.container.context.getColor(R.color.selectHighlight)
