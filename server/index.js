@@ -24,10 +24,12 @@ app.use(bodyParser.json())
 
 app.use(express.static('../website/dist'))
 
-app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
-}));
+app.use(
+    cors({
+        origin: 'http://localhost:3000',
+        credentials: true
+    })
+)
 
 //Logs all requests.
 app.use((req, res, next) => {
