@@ -46,7 +46,8 @@ class LoginActivity : AppCompatActivity() {
 //                    val intent = Intent(this, WarehouseActivity::class.java)
 //                    intent.putExtra("loggedIn", true)
 //                    startActivity(intent)
-                    onBackPressed() //TODO: Replace with startActivityForResult logic.
+//                    onBackPressed() //TODO: Replace with startActivityForResult logic.
+                    finish()
                 }
             }
         }

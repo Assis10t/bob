@@ -241,6 +241,11 @@ class ServerConnection {
     }
     val login = loginFactory(httpClient, Gson())
 
+    val logout = { context: Context, onLogoutComplete: ((error: Exception?) -> Unit)? ->
+        setCurrentUsername(context, null)
+        onLogoutComplete?.invoke(null)
+    }
+
     val registerFactory = { http: OkHttpClient, gson: Gson ->
         { context: Context, username: String, onRegisterComplete: ((error: Exception?, user: User?) -> Unit)? ->
             connect { server ->

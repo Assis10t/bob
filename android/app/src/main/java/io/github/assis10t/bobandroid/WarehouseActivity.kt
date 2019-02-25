@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.activity_warehouse.*
 import timber.log.Timber
 
 
-class WarehouseActivity : AppCompatActivity() {
+class WarehouseActivity : ActivityWithLoginMenu() {
 
     lateinit var warehouseId: String
     var warehouse: Warehouse? = null
@@ -25,6 +25,12 @@ class WarehouseActivity : AppCompatActivity() {
         setContentView(R.layout.activity_warehouse)
 
         warehouseId = intent.getStringExtra("warehouseId")
+        val warehouseName = intent.getStringExtra("warehouseName")
+
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+        supportActionBar?.title = warehouseName
 
         container.isEnabled = false
         item_list.layoutManager = GridLayoutManager(this, 2)
@@ -81,25 +87,19 @@ class WarehouseActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_toolbar, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
-        return when (item.itemId) {
-            R.id.login -> {
-                startActivity(Intent(this, LoginActivity::class.java))
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == android.R.id.home) {
+            finish()
+            return true
+        } else {
+            return super.onOptionsItemSelected(item)
         }
     }
 
     class ItemAdapter(var onSelectionChanged: (selected: List<Item>) -> Unit): RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
         var itemList: List<Item> = listOf()
         val selectedItems: MutableList<Item> = mutableListOf()
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_warehouse_item, parent, false)
             return ViewHolder(view)

@@ -23,12 +23,11 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import io.github.assis10t.bobandroid.pojo.Warehouse
 import kotlinx.android.synthetic.main.activity_warehouse_list.*
 
 // Location permission logic from https://github.com/oktay-sen/Coinz
-class WarehouseListActivity : AppCompatActivity(), OnMapReadyCallback {
+class WarehouseListActivity : ActivityWithLoginMenu(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 
@@ -41,6 +40,9 @@ class WarehouseListActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_warehouse_list)
+
+        supportActionBar?.title = "Shops near you"
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -142,22 +144,6 @@ class WarehouseListActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_toolbar, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
-        return when (item.itemId) {
-            R.id.login -> {
-                startActivity(Intent(this, LoginActivity::class.java))
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     class WarehouseAdapter(private var warehouseList: List<Warehouse> = listOf()) : RecyclerView.Adapter<WarehouseAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -173,6 +159,7 @@ class WarehouseListActivity : AppCompatActivity(), OnMapReadyCallback {
             vh.container.setOnClickListener {v ->
                 val intent = Intent(v.context, WarehouseActivity::class.java)
                 intent.putExtra("warehouseId", warehouseList[pos]._id)
+                intent.putExtra("warehouseName", warehouseList[pos].name)
                 v.context.startActivity(intent)
             }
         }

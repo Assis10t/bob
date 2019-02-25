@@ -35,7 +35,7 @@
 
         <activity
                 android:name=".WarehouseListActivity"
-                android:label="@string/title_activity_warehouse_list">
+                android:launchMode="singleInstance">
         </activity>
         <activity
                 android:name=".LoadingActivity"
@@ -46,11 +46,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity"
+                  android:launchMode="singleInstance">
         </activity>
         <activity
-                android:name=".WarehouseActivity"
-                android:launchMode="singleInstance">
+                android:name=".WarehouseActivity">
         </activity>
     </application>
 
