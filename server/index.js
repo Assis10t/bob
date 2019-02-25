@@ -5,9 +5,11 @@ const model = require('./model')
 const bonjour = require('bonjour')()
 const utils = require('./utils')
 const cors = require('cors')
-const auth = require('./auth')
 
+const robot_path = require('./robot-pathfinding.js')
 const PORT = process.env.PORT || 9000
+
+const auth = require('./auth')
 
 const API_LEVEL = 'v2'
 console.log('Using api level ' + API_LEVEL)
@@ -41,26 +43,24 @@ app.get(
     auth.customer((req, res, next) =>
         model
             .getOrders(req.user._id)
-            .then(orders => {
-                if (orders) res.json({ success: true, orders })
-                else res.status(404).json({ success: false, orders: null })
-            })
+            .then(orders => res.json({ success: true, orders }))
             .catch(next)
     )
 )
 
 app.get(
     '/order/:orderId',
-    auth.customer((req, res, next) => {
-        const orderId = req.params.orderId
+    auth.customer((req, res, next) =>
         model
-            .getOrderById(orderId)
+            .getOrderById(req.params.orderId)
             .then(order => {
-                if (order) res.json({ success: true, order })
+                if (order && req.user._id.equals(order.userId)) res.json({ success: true, order })
+                else if (order)
+                    res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
                 else res.status(404).json({ success: true, order: null })
             })
             .catch(next)
-    })
+    )
 )
 // TODO: Check if ordered items exist.
 // TODO: Reduce amount on items ordered.
@@ -77,19 +77,22 @@ app.post(
 app.get('/warehouse', (req, res, next) => {
     model
         .getWarehouses()
-        .then(warehouses => {
-            if (warehouses) res.json({ success: true, warehouses })
-            else res.status(404).json({ success: true, warehouses: null })
-        })
+        .then(warehouses => res.json({ success: true, warehouses }))
         .catch(next)
 })
+app.post(
+    '/warehouse',
+    auth.merchant((req, res, next) => {
+        model
+            .addWarehouse({ ...req.body, merchantId: req.user._id })
+            .then(warehouse => res.json({ success: true, warehouse }))
+            .catch(next)
+    })
+)
 app.get('/warehouse/:warehouseId', (req, res, next) => {
     model
         .getWarehouseById(req.params.warehouseId)
-        .then(warehouse => {
-            if (warehouse) res.json({ success: true, warehouse })
-            else res.status(404).json({ success: true, warehouse: null })
-        })
+        .then(warehouse => res.status(warehouse ? 200 : 404).json({ success: true, warehouse }))
         .catch(next)
 })
 
@@ -97,7 +100,7 @@ app.post(
     '/warehouse/:warehouseId/items',
     auth.merchant((req, res, next) => {
         model
-            .getWarehouseById(warehouseId)
+            .getWarehouseById(req.params.warehouseId)
             .then(warehouse => {
                 if (!warehouse) {
                     res.status(404).json({
@@ -106,7 +109,7 @@ app.post(
                     })
                     throw null
                 }
-                if (warehouse.merchantId !== req.user._id) {
+                if (!req.user._id.equals(warehouse.merchantId)) {
                     res.status(403).json({
                         success: false,
                         error: 'You cannot modify items in a warehouse you dont own.'
@@ -150,16 +153,69 @@ app.get('/getmovement', (req, res, next) => {
 app.post('/register', (req, res, next) => {
     model
         .createUser(req.body.username, req.body.type)
-        .then(user => res.json({ success: true, user }))
+        .then(user => {
+            if (req.body.type == 'robot') {
+                model
+                    .addRobot(user.username, 0, 0)
+                    .then(res.json({ success: true, user }))
+                    .catch(next)
+            } else {
+                res.json({ success: true, user })
+            }
+        })
         .catch(next)
 })
 app.post('/login', (req, res, next) => {
+    model.authUser(req.body.username).then(user => {
+        if (user) res.json({ success: true, user })
+        else res.status(401).json({ success: false, error: 'Username or password is incorrect.' })
+    })
+})
+app.get(
+    '/robot',
+    auth.robot((req, res, next) => {
+        var currentUser = req.user
+        model
+            .getRobot(currentUser.username)
+            .then(robot => res.json({ success: true, robot }))
+            .catch(next)
+    })
+)
+
+app.get(
+    '/robot/:robotId',
+    auth.merchant((req, res, next) => {
+        model
+            .getRobot(req.params.robotId)
+            .then(robot => res.json({ success: true, robot }))
+            .catch(next)
+    })
+)
+app.post(
+    '/robot/:robotid/sethome',
+    auth.merchant((req, res, next) => {
+        model
+            .setHome(req.params.robotid, req.body.home_x, req.body.home_y)
+            .then(robot => res.json({ success: true, robot }))
+            .catch(next)
+    })
+)
+
+app.get(
+    '/robotjob',
+    auth.robot((req, res, next) => {
+        model
+            .getNextJob(req.user.username)
+            .then(job => res.json({ success: true, job }))
+            .catch(next)
+    })
+)
+
+// For imaging the database and updating fake_db.json
+app.get('/db', (req, res, next) => {
     model
-        .authUser(req.body.username)
-        .then(user => {
-            if (user) res.json({ success: true, user })
-            else res.status(401).json({ success: false, error: 'Username or password is incorrect.' })
-        })
+        .getWholeDB()
+        .then(data => res.json(data))
         .catch(next)
 })
 

@@ -6,6 +6,14 @@
             desc="You can control Bob's movement from here."
         ></page-title>
 
+        <section class="section">
+            <div class="container">
+                <div class="box p0">
+                    
+                </div>
+            </div>
+        </section>
+
     </div>
 </template>
 
