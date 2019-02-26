@@ -145,10 +145,10 @@
                                 </td>
 
                                 <td>
-                                    <a href="#" class="has-text-success">
+                                    <nuxt-link :to="'/merchant/items/edit/' + warehouseId + '_' + item._id" class="has-text-success">
                                         <i class="mdi mdi-pencil"></i>
                                         Edit
-                                    </a>
+                                    </nuxt-link>
                                 </td>
                                 <td>
                                     <a href="javascript:;" class="has-text-danger" @click="deleteItem(warehouseId, item._id, i)">
