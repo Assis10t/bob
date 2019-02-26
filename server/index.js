@@ -4,6 +4,8 @@ const db = require('./db')
 const model = require('./model')
 const bonjour = require('bonjour')()
 const utils = require('./utils')
+const cors = require('cors')
+
 const robot_path = require('./robot-pathfinding.js')
 const PORT = process.env.PORT || 9000
 
@@ -18,9 +20,16 @@ db.init()
 
 const app = express()
 
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '50mb' }))
 
-app.use(express.static('public'))
+app.use(express.static('../website/dist'))
+
+app.use(
+    cors({
+        origin: 'http://localhost:3000',
+        credentials: true
+    })
+)
 
 //Logs all requests.
 app.use((req, res, next) => {
@@ -56,11 +65,14 @@ app.get(
     )
 )
 // TODO: Check if ordered items exist.
-// TODO: Reduce amount on items ordered.
 app.post(
     '/order',
     auth.customer((req, res, next) => {
-        const order = { ...req.body, userId: req.user._id }
+        const order = {
+            ...req.body,
+            userId: req.user._id,
+            timestamp: new Date().toISOString()
+        }
         model
             .addOrder(order)
             .then(order => res.json({ success: true, order }))
@@ -116,10 +128,56 @@ app.post(
     })
 )
 app.get(
+    '/warehouse/:warehouseId/items/:itemId',
+    auth.merchant((req, res, next) => {
+        model
+            .getItemById(req.params.itemId)
+            .then(item => {
+                if (!item) {
+                    res.status(404).json({ success: false, error: 'Item not found.' })
+                    throw null
+                }
+                return model.getWarehouseById(item.warehouseId).then(warehouse => {
+                    if (!req.user._id.equals(warehouse.merchantId)) {
+                        res.status(403).json({ success: false, error: 'You are not allowed to access this resource.' })
+                        throw null
+                    }
+                    return item
+                })
+            })
+            .then(item => res.json({ success: true, item }))
+            .catch(err => err && next(err))
+    })
+)
+app.delete(
+    '/warehouse/:warehouseId/items/:itemId',
+    auth.merchant((req, res, next) => {
+        model
+            .getItemById(req.params.itemId)
+            .then(item => {
+                if (!item) {
+                    res.status(404).json({ success: false, error: 'Item not found.' })
+                    throw null
+                }
+                return model.getWarehouseById(item.warehouseId)
+            })
+            .then(warehouse => {
+                if (!req.user._id.equals(warehouse.merchantId)) {
+                    res.status(403).json({ success: false, error: 'You are not allowed to access this resource.' })
+                    throw null
+                }
+                return req.params.itemId
+            })
+            .then(itemId => model.deleteItemById(itemId))
+            .then(() => res.json({ success: true }))
+            .catch(err => err && next(err))
+    })
+)
+app.get(
     '/warehouse/:warehouseId/orders',
     auth.merchant((req, res, next) => {
         model
-            .getOrdersByWarehouseId({ warehouseId: req.params.warehouseId })
+            .getOrdersByWarehouseId(req.params.warehouseId)
             .then(orders => res.json({ success: true, orders }))
             .catch(next)
     })
@@ -228,4 +286,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}.`)
 })
+//assis10t._http._tcp.
 bonjour.publish({ name: 'assis10t', type: 'http', host: utils.getIp(), port: PORT })
