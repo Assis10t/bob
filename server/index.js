@@ -130,8 +130,12 @@ app.get(
         model
             .getItemById(req.params.itemId)
             .then(item => {
+                if (!item) {
+                    res.status(404).json({ success: false, error: 'Item not found.' })
+                    throw null
+                }
                 return model.getWarehouseById(item.warehouseId).then(warehouse => {
-                    if (!req.user._id.equals(warehouse.userId)) {
+                    if (!req.user._id.equals(warehouse.merchantId)) {
                         res.status(403).json({ success: false, error: 'You are not allowed to access this resource.' })
                         throw null
                     }
@@ -147,9 +151,15 @@ app.delete(
     auth.merchant((req, res, next) => {
         model
             .getItemById(req.params.itemId)
-            .then(item => model.getWarehouseById(item.warehouseId))
+            .then(item => {
+                if (!item) {
+                    res.status(404).json({ success: false, error: 'Item not found.' })
+                    throw null
+                }
+                return model.getWarehouseById(item.warehouseId)
+            })
             .then(warehouse => {
-                if (!req.user._id.equals(warehouse.userId)) {
+                if (!req.user._id.equals(warehouse.merchantId)) {
                     res.status(403).json({ success: false, error: 'You are not allowed to access this resource.' })
                     throw null
                 }
