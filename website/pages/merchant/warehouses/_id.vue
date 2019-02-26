@@ -69,7 +69,7 @@
                 <h3 class="has-text-centered mt50 mb20">Orders</h3>
 
                 <div class="box is-full-width">
-                    <table class="table is-full-width">
+                    <table class="table is-full-width" v-if="orders.length > 0">
                         <thead>
                             <tr>
                                 <td>Items</td>
@@ -100,12 +100,15 @@
                             </tr>
                         </tbody>
                     </table>
+                    <h3 class="has-text-centered m30-0" v-else>
+                        No orders have been placed.
+                    </h3>
                 </div>
 
                 <h3 class="has-text-centered mt50 mb20">Items</h3>
 
                 <div class="box is-full-width">
-                    <table class="table is-full-width">
+                    <table class="table is-full-width" v-if="items.length > 0">
                         <thead>
                             <tr>
                                 <td>Name</td>
@@ -156,6 +159,9 @@
                             </tr>
                         </tbody>
                     </table>
+                    <h3 class="has-text-centered m30-0" v-else>
+                        You still haven't added any items.
+                    </h3>
                 </div>
                 <div class="is-flex justify-start align-center">
                     <nuxt-link 

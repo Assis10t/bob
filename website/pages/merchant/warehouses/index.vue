@@ -14,7 +14,7 @@
                     </nuxt-link>
                 </div>
                 <div class="box is-full-width">
-                    <table class="table is-full-width">
+                    <table class="table is-full-width" v-if="warehouses.length > 0">
                         <thead>
                             <tr>
                                 <td>Warehouse name</td>
@@ -67,6 +67,9 @@
                             </tr>
                         </tbody>
                     </table>
+                    <h3 class="has-text-centered m30-0" v-else>
+                        You still haven't added any warehouses.
+                    </h3>
                 </div>
             </div>
         </section>
@@ -104,6 +107,7 @@ export default {
                     console.log("Server response: ", res);
 
                     this.warehouses = this.filterWarehouses(res.data.warehouses)
+                    // this.warehouses = res.data.warehouses
 
                     // if (res.status == 200) {
                     //     this.$router.push('/merchant/orders').go(1)

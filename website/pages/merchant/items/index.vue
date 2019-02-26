@@ -27,13 +27,14 @@
                 <div class="is-flex justify-end">
                     <nuxt-link 
                         :to="'/merchant/items/create/' + (selectedWarehouse ? selectedWarehouse._id : '')" 
-                        class="button is-link mb15">
+                        class="button is-link mb15"
+                        v-if="selectedWarehouse">
                         <span>Add an item to this warehouse</span>
                     </nuxt-link>
                 </div>
 
                 <div class="box is-full-width">
-                    <table class="table is-full-width">
+                    <table class="table is-full-width" v-if="selectedWarehouse && items.length > 0">
                         <thead>
                             <tr>
                                 <td>Name</td>
@@ -84,6 +85,12 @@
                             </tr>
                         </tbody>
                     </table>
+                    <h3 class="has-text-centered m30-0" v-else-if="!selectedWarehouse">
+                        You haven't added any warehouses.
+                    </h3>
+                    <h3 class="has-text-centered m30-0" v-else>
+                        You still haven't added any items.
+                    </h3>
                 </div>
             </div>
         </section>

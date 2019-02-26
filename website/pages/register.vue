@@ -96,7 +96,7 @@ export default {
                         this.message.status = res.status == 200 ? 'success' : 'danger'
                         this.message.text = 'You have successfully created your account!'
 
-                        if (this.message.status == 200) {
+                        if (res.status == 200) {
                             this.$router.push('/merchant/orders').go(1)
                         }
                     })

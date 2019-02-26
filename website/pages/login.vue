@@ -11,8 +11,19 @@
                         <div class="field">
                             <label class="label">Username:</label>
                             <div class="control">
-                                <input class="input" type="text" placeholder="Enter your full name" v-model="username">
+                                <input 
+                                    :class="[
+                                        'input', 'is-' + message.status
+                                    ]" 
+                                    type="text" 
+                                    placeholder="Enter your full name" 
+                                    v-model="username">
                             </div>
+                            <p :class="[
+                                'help', 'is-' + message.status
+                            ]">
+                                {{ message.text }}
+                            </p>
                         </div>
                         <div class="field">
                             <label class="label">Password:</label>
@@ -58,6 +69,10 @@ export default {
             username: null,
             password: null,
             type: 'merchant',
+            message: {
+                status: null,
+                text: null
+            }
         }
     },
     methods: {
@@ -80,9 +95,15 @@ export default {
     
                         if (res.status == 200) {
                             this.$router.push('/merchant/orders').go(1)
+                        } else {
+                            this.message.status = 'danger'
+                            this.message.text = 'There is no such username in our database.'
                         }
                     })
-                    .catch(function(error) {
+                    .catch((error) => {
+                        this.message.status = 'danger'
+                        this.message.text = 'There is no such username in our database.'
+
                         console.error("Error adding document: ", error);
                     });
             }
