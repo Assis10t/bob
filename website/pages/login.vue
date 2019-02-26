@@ -14,12 +14,12 @@
                                 <input class="input" type="text" placeholder="Enter your full name" v-model="username">
                             </div>
                         </div>
-                        <!-- <div class="field">
+                        <div class="field">
                             <label class="label">Password:</label>
                             <div class="control">
                                 <input class="input" type="password" v-model="password" placeholder="Enter your password">
                             </div>
-                        </div> -->
+                        </div>
                         <!-- <div class="field">
                             <label class="label">Confirm password:</label>
                             <div class="control">
@@ -31,7 +31,7 @@
                                 <a 
                                     href="javascript:;"
                                     class="button is-link" 
-                                    :disabled="!username"
+                                    :disabled="!username || !password"
                                     @click.stop.prevent="login()">
                                     <span>Login</span>
                                 </a>
@@ -62,11 +62,11 @@ export default {
     },
     methods: {
         login () {
-            if (this.username) {
+            if (this.username && this.password) {
                 axios.
                     post('http://localhost:9000/login/', {
                         username: this.username,
-                        // password: this.password,
+                        password: this.password,
                         // type: this.type,
                     }, {
                         headers: {
