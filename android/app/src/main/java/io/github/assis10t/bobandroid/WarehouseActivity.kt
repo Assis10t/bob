@@ -34,20 +34,16 @@ class WarehouseActivity : ActivityWithLoginMenu() {
 
         container.isEnabled = false
         item_list.layoutManager = GridLayoutManager(this, 2)
-        item_list.adapter = ItemAdapter { selected ->
-            if (selected.isEmpty())
-                make_order.hide()
-            else
-                make_order.show()
-        }
-
+        item_list.adapter = ItemAdapter()
+        (item_list.adapter as ItemAdapter).updateItems(listOf(
+            Item("some_id2", "some_id", "My Item", "my_img", null, null, null, 1.25)
+        )) //TODO: Remove this.
         make_order.hide()
         make_order.setOnClickListener {
             container.isRefreshing = true
             make_order.hide()
-            val adapter = item_list.adapter as ItemAdapter
             val order = Order.Factory()
-                .items(adapter.selectedItems)
+                .items(listOf()) //TODO: Implement shopping cart.
                 .warehouseId(warehouseId)
                 .build()
             ServerConnection().makeOrder(this, order) { err ->
@@ -96,9 +92,8 @@ class WarehouseActivity : ActivityWithLoginMenu() {
         }
     }
 
-    class ItemAdapter(var onSelectionChanged: (selected: List<Item>) -> Unit): RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
+    class ItemAdapter: RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
         var itemList: List<Item> = listOf()
-        val selectedItems: MutableList<Item> = mutableListOf()
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_warehouse_item, parent, false)
@@ -109,33 +104,15 @@ class WarehouseActivity : ActivityWithLoginMenu() {
 
         override fun onBindViewHolder(vh: ViewHolder, pos: Int) {
             val item = itemList[pos]
-            val context = vh.container.context
             vh.title.text = item.name
-            vh.price.text = "£${item.price}/${item.unit?:"item"}"
-            vh.container.setCardBackgroundColor(
-                if (selectedItems.contains(item))
-                    vh.container.context.getColor(R.color.selectHighlight)
-                else
-                    vh.container.context.getColor(R.color.white)
-            )
-            vh.container.cardElevation =
-                    if (selectedItems.contains(item))
-                        dp(context, 4f)
-                    else
-                        dp(context, 1f)
-            vh.container.setOnClickListener {
-                if (selectedItems.contains(item))
-                    selectedItems.remove(item)
-                else
-                    selectedItems.add(item)
-                onSelectionChanged(itemList)
-                notifyItemChanged(pos)
+            vh.price.text = item.getPriceText()
+            vh.container.setOnClickListener {v ->
+                AddToCartDialog(v.context, item).show()
             }
         }
 
         fun updateItems(items: List<Item>) {
             this.itemList = items
-            this.selectedItems.clear()
             notifyDataSetChanged()
         }
 
