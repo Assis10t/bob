@@ -28,7 +28,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="warehouse in warehouses" :key="warehouse._id">
+                            <tr v-for="(warehouse, i) in warehouses" :key="warehouse._id">
                                 <td>
                                     <b>{{ warehouse.name }}</b>
                                 </td>
@@ -59,7 +59,7 @@
                                     </nuxt-link>
                                 </td>
                                 <td>
-                                    <a href="#" class="has-text-danger">
+                                    <a href="javascript:;" class="has-text-danger" @click="deleteWarehouse(warehouse._id, i)">
                                         <i class="mdi mdi-delete"></i>
                                         Delete
                                     </a>
@@ -116,6 +116,9 @@ export default {
                 .catch(function(error) {
                     console.error("Error adding document: ", error);
                 });
+        },
+        deleteWarehouse: function (warehouseId, i) {
+            this.warehouses.splice(i, 1)
         }
     },
     mounted: function () {

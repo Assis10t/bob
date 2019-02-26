@@ -48,7 +48,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="item in items" :key="item._id">
+                            <tr v-for="(item, i) in items" :key="item._id">
                                 <td>
                                     <b>{{ item.name }}</b>
                                 </td>
@@ -77,7 +77,7 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="#" class="has-text-danger">
+                                    <a href="javascript:;" class="has-text-danger" @click="deleteItem(item._id, i)">
                                         <i class="mdi mdi-delete"></i>
                                         Delete
                                     </a>
@@ -89,7 +89,7 @@
                         You haven't added any warehouses.
                     </h3>
                     <h3 class="has-text-centered m30-0" v-else>
-                        You still haven't added any items.
+                        You haven't added any items.
                     </h3>
                 </div>
             </div>
@@ -160,6 +160,9 @@ export default {
                     console.error("Error adding document: ", error);
                 });
         },
+        deleteItem: function (itemId, i) {
+            this.items.splice(i, 1)
+        }
     },
     mounted: function () {
         this.getWarehouses()
