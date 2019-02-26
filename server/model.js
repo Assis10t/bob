@@ -60,8 +60,8 @@ const factory = db => ({
             .collection('warehouses')
             .find()
             .toArray(),
-    addWarehouse: warehouse => {
-        if (!warehouse._id) {
+    addWarehouse: ({ _id, ...warehouse }) => {
+        if (!_id) {
             warehouse = { _id: new ObjectID(), ...warehouse }
             return db()
                 .collection('warehouses')
@@ -70,8 +70,8 @@ const factory = db => ({
         } else {
             return db()
                 .collection('warehouses')
-                .updateOne({ _id: warehouse._id }, { $set: warehouse })
-                .then(modifiedCount => (modifiedCount ? warehouse : null))
+                .updateOne({ _id: ObjectID(_id) }, { $set: warehouse })
+                .then(() => factory(db).getWarehouseById(_id))
         }
     },
     getWarehouseById: async warehouseId => {
@@ -91,6 +91,14 @@ const factory = db => ({
             .collection('inventory')
             .find({ warehouseId })
             .toArray(),
+    getItemById: id =>
+        db()
+            .collection('inventory')
+            .findOne({ _id: ObjectID(id) }),
+    deleteItemById: id =>
+        db()
+            .collection('inventory')
+            .deleteOne({ _id: ObjectID(id) }),
     getOrdersByWarehouseId: warehouseId =>
         db()
             .collection('orders')
