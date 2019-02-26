@@ -188,7 +188,7 @@ const factory = db => ({
                         rej(err)
                     } else {
                         db()
-                            .collection('warehouse')
+                            .collection('warehouses')
                             .find({})
                             .toArray((err, warehouse) => {
                                 db()
