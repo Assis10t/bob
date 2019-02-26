@@ -58,9 +58,10 @@ class WarehouseListActivity : ActivityWithLoginMenu(), OnMapReadyCallback {
         behavior.skipCollapsed = false
 
         warehouse_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        warehouse_list.adapter = WarehouseAdapter(listOf(
-            Warehouse("some_id","My Warehouse") //TODO: Remove this.
-        ))
+//        warehouse_list.adapter = WarehouseAdapter(listOf(
+//            Warehouse("some_id","My Warehouse") //TODO: Remove this.
+//        ))
+        warehouse_list.adapter = WarehouseAdapter(listOf())
         loading.visibility = View.GONE
     }
 

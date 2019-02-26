@@ -35,24 +35,11 @@ class WarehouseActivity : ActivityWithLoginMenu() {
         container.isEnabled = false
         item_list.layoutManager = GridLayoutManager(this, 2)
         item_list.adapter = ItemAdapter()
-        (item_list.adapter as ItemAdapter).updateItems(listOf(
-            Item("some_id2", "some_id", "My Item", "my_img", null, null, null, 1.25)
-        )) //TODO: Remove this.
-        make_order.setOnClickListener {
-            container.isRefreshing = true
-            make_order.hide()
-            val order = Order.Factory()
-                .items(listOf()) //TODO: Implement shopping cart.
-                .warehouseId(warehouseId)
-                .build()
-            ServerConnection().makeOrder(this, order) { err ->
-                if (err != null)
-                    Timber.e("Could not make order. $err")
-                else {
-                    Timber.d("Order made.")
-                    refreshItems()
-                }
-            }
+//        (item_list.adapter as ItemAdapter).updateItems(listOf(
+//            Item("some_id2", "some_id", "My Item", "my_img", null, null, null, 1.25)
+//        )) //TODO: Remove this.
+        view_cart.setOnClickListener {
+            ViewCartDialog(this, warehouseId).show()
         }
     }
 

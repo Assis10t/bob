@@ -59,3 +59,8 @@ fun getCart(context: Context) = context
     .getStringSet("cart", setOf())
     .toList()
     .map { Item.fromString(it) }
+
+fun clearCart(context: Context) {
+    val preferences = context.getSharedPreferences("bob", Context.MODE_PRIVATE)
+    preferences.edit().remove("cart").commit()
+}
