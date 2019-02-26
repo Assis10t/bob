@@ -122,7 +122,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="item in items" :key="item._id">
+                            <tr v-for="(item, i) in items" :key="item._id">
                                 <td>
                                     <b>{{ item.name }}</b>
                                 </td>
@@ -151,7 +151,7 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="#" class="has-text-danger">
+                                    <a href="javascript:;" class="has-text-danger" @click="deleteItem(warehouseId, item._id, i)">
                                         <i class="mdi mdi-delete"></i>
                                         Delete
                                     </a>
@@ -221,6 +221,24 @@ export default {
                     console.log("Server response: ", res);
                     
                     this.orders = res.data.orders
+                })
+                .catch(function(error) {
+                    console.error("Error adding document: ", error);
+                });
+        },
+        deleteItem: function (warehouseId, itemId, i) {
+            axios.
+                delete(
+                    'http://localhost:9000/warehouse/' + warehouseId + '/items/' + itemId, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'username': this.$store.state.user.username,
+                    }
+                })
+                .then((res) => {
+                    console.log("Server response: ", res);
+                    
+                    this.items.splice(i, 1)
                 })
                 .catch(function(error) {
                     console.error("Error adding document: ", error);

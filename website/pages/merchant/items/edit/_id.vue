@@ -14,11 +14,11 @@
                     <nuxt-link to="/merchant/items" class="is-inline-block mb15">Back to all items</nuxt-link>
 
                     <div class="box p30 pl50 pr50">
-                        <form action="">
+                        <form action="" v-if="item && warehouse">
                             <div class="field">
                                 <label class="label">Item name:</label>
                                 <div class="control">
-                                    <input class="input" type="text" placeholder="Enter item name" v-model="name">
+                                    <input class="input" type="text" placeholder="Enter item name" v-model="item.name">
                                 </div>
                             </div>
                             <div class="field">
@@ -26,7 +26,7 @@
                                 <div class="control">
                                     <input class="input" type="file" placeholder="Enter your warehouse name" @change="uploadFile">
                                 </div>
-                                <img class="small-img mt15" :src="image" alt="">
+                                <img class="small-img mt15" :src="item.image" alt="">
                             </div>
                             <div class="field" v-if="warehouse.dimensions">
                                 <label class="label">Position:</label>
@@ -36,7 +36,7 @@
                                             name="x" 
                                             id="x" 
                                             class="input"
-                                            v-model.number="position.x">
+                                            v-model.number="item.position.x">
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in (warehouse.dimensions.x + 1)">
@@ -49,7 +49,7 @@
                                             name="y" 
                                             id="y" 
                                             class="input"
-                                            v-model.number="position.y">
+                                            v-model.number="item.position.y">
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in (warehouse.dimensions.y + 1)">
@@ -62,7 +62,7 @@
                                             name="x" 
                                             id="x" 
                                             class="input"
-                                            v-model.number="position.z">
+                                            v-model.number="item.position.z">
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in warehouse.dimensions.z.length">
@@ -76,18 +76,18 @@
                                 <div class="control columns">
                                     <div class="column is-6">
                                         <label class="label">Quantity:</label>
-                                        <input class="input" type="number" placeholder="Enter item quantity" v-model.number="quantity">
+                                        <input class="input" type="number" placeholder="Enter item quantity" v-model.number="item.quantity">
                                     </div>
                                     <div class="column is-6">
                                         <label class="label">Unit:</label>
-                                        <input class="input" type="text" placeholder="Enter measerment unit" v-model="unit">
+                                        <input class="input" type="text" placeholder="Enter measerment unit" v-model="item.unit">
                                     </div>
                                 </div>
                             </div>
                             <div class="field" v-if="warehouse.dimensions">
                                 <div class="control">
                                     <label class="label">Price:</label>
-                                    <input class="input" type="number" placeholder="Enter item price" v-model.number="price">
+                                    <input class="input" type="number" placeholder="Enter item price" v-model.number="item.price">
                                 </div>
                             </div>
                             
@@ -96,13 +96,15 @@
                                     <a 
                                         href="javascript:;"
                                         class="button is-link" 
-                                        :disabled="!can_submit"
-                                        @click.stop.prevent="addItem()">
-                                        <span>Add item</span>
+                                        @click.stop.prevent="updateItem()">
+                                        <span>Update item</span>
                                     </a>
                                 </div>
                             </div>
                         </form>
+                        <h3 class="has-text-centered m30-0" v-else>
+                            Loading...
+                        </h3>
                     </div>
 
                     <nuxt-link to="/merchant/items" class="is-inline-block">Back to all items</nuxt-link>
@@ -122,8 +124,10 @@ export default {
     },
     data: function () {
         return {
-            itemId: this.$nuxt._route.params.id,
-            item: {}
+            warehouseId: this.$nuxt._route.params.id.split('_')[0],
+            itemId: this.$nuxt._route.params.id.split('_')[1],
+            item: null,
+            warehouse: null
         }
     },
     methods: {
@@ -143,6 +147,23 @@ export default {
                     console.error("Error adding document: ", error);
                 });
         },
+        getItem () {
+            axios.
+                get('http://localhost:9000/warehouse/' + this.warehouseId + '/items/' + this.itemId, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'username': this.$store.state.user.username,
+                    }
+                })
+                .then((res) => {
+                    console.log("Server response: ", res);
+                    
+                    this.item = res.data.item
+                })
+                .catch(function(error) {
+                    console.error("Error adding document: ", error);
+                });
+        },
         uploadFile: function (event) {
             let file = event.target.files[0]
             this.createImage(file);
@@ -152,38 +173,29 @@ export default {
             var reader = new FileReader();
 
             reader.onload = (e) => {
-                this.image = e.target.result;
+                this.item.image = e.target.result;
             };
 
             reader.readAsDataURL(file);
         },
-        addItem () {
-            if (this.can_submit) {
-                axios.
-                    post('http://localhost:9000/warehouse/' + this.warehouseId + '/items', {
-                        name: this.name,
-                        image: this.image,
-                        position: this.position,
-                        quantity: this.quantity,
-                        unit: this.unit,
-                        price: this.price,
-                    }, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'username': this.$store.state.user.username,
-                        }
-                    })
-                    .then((res) => {
-                        console.log("Server response: ", res);
-    
-                        if (res.status == 200) {
-                            this.$router.push('/merchant/warehouses/' + this.warehouseId).go(1)
-                        }
-                    })
-                    .catch(function(error) {
-                        console.error("Error adding document: ", error);
-                    });
-            }
+        updateItem () {
+            axios.
+                post('http://localhost:9000/warehouse/' + this.warehouseId + '/items', this.item, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'username': this.$store.state.user.username,
+                    }
+                })
+                .then((res) => {
+                    console.log("Server response: ", res);
+
+                    if (res.status == 200) {
+                        this.$router.push('/merchant/items').go(1)
+                    }
+                })
+                .catch(function(error) {
+                    console.error("Error adding document: ", error);
+                });
         }
     },
     computed: {
@@ -193,6 +205,7 @@ export default {
     },
     mounted: function () {
         this.getWarehouse()
+        this.getItem()
     }
 };
 </script>

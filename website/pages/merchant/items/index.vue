@@ -71,13 +71,13 @@
                                 </td>
 
                                 <td>
-                                    <a href="#" class="has-text-success">
+                                    <nuxt-link :to="'/merchant/items/edit/' + selectedWarehouse._id + '_' + item._id" class="has-text-success">
                                         <i class="mdi mdi-pencil"></i>
                                         Edit
-                                    </a>
+                                    </nuxt-link>
                                 </td>
                                 <td>
-                                    <a href="javascript:;" class="has-text-danger" @click="deleteItem(item._id, i)">
+                                    <a href="javascript:;" class="has-text-danger" @click="deleteItem(selectedWarehouse._id, item._id, i)">
                                         <i class="mdi mdi-delete"></i>
                                         Delete
                                     </a>
@@ -160,8 +160,23 @@ export default {
                     console.error("Error adding document: ", error);
                 });
         },
-        deleteItem: function (itemId, i) {
-            this.items.splice(i, 1)
+        deleteItem: function (warehouseId, itemId, i) {
+            axios.
+                delete(
+                    'http://localhost:9000/warehouse/' + warehouseId + '/items/' + itemId, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'username': this.$store.state.user.username,
+                    }
+                })
+                .then((res) => {
+                    console.log("Server response: ", res);
+                    
+                    this.items.splice(i, 1)
+                })
+                .catch(function(error) {
+                    console.error("Error adding document: ", error);
+                });
         }
     },
     mounted: function () {
