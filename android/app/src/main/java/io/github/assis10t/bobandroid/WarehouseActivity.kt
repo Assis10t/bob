@@ -38,7 +38,6 @@ class WarehouseActivity : ActivityWithLoginMenu() {
         (item_list.adapter as ItemAdapter).updateItems(listOf(
             Item("some_id2", "some_id", "My Item", "my_img", null, null, null, 1.25)
         )) //TODO: Remove this.
-        make_order.hide()
         make_order.setOnClickListener {
             container.isRefreshing = true
             make_order.hide()
