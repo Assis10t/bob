@@ -20,7 +20,7 @@ db.init()
 
 const app = express()
 
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '50mb' }))
 
 app.use(express.static('../website/dist'))
 
