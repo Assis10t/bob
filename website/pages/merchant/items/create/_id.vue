@@ -39,7 +39,8 @@
                                             v-model.number="position.x">
                                             <option 
                                                 :value="n - 1"
-                                                v-for="n in (warehouse.dimensions.x + 1)">
+                                                v-for="n in (warehouse.dimensions.x + 1)"
+                                                :key="'x' + n">
                                                 {{ n - 1 }}
                                             </option>
                                         </select>
@@ -52,7 +53,8 @@
                                             v-model.number="position.y">
                                             <option 
                                                 :value="n - 1"
-                                                v-for="n in (warehouse.dimensions.y + 1)">
+                                                v-for="n in (warehouse.dimensions.y + 1)"
+                                                :key="'y' + n">
                                                 {{ n - 1 }}
                                             </option>
                                         </select>
@@ -65,7 +67,8 @@
                                             v-model.number="position.z">
                                             <option 
                                                 :value="n - 1"
-                                                v-for="n in warehouse.dimensions.z.length">
+                                                v-for="n in warehouse.dimensions.z.length"
+                                                :key="'z' + n">
                                                 {{ n - 1 }}
                                             </option>
                                         </select>

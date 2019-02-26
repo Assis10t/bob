@@ -5,14 +5,15 @@
             <div class="container has-text-centered">
                 <h1 class="is-inline-block is-relative mb25">
                     All items in 
-                    <label class="transparent-label" @click="triggerSelect()">
+                    <label class="transparent-label" @click="triggerSelect()" v-if="selectedWarehouse">
                         {{ selectedWarehouse ? selectedWarehouse.name : 'loading...' }} <i class="mdi mdi-chevron-down"></i>
                     </label>
                     <select 
                         class="transparent-select" 
                         name="warehouse" 
                         v-model="selectedWarehouse"
-                        @change="getItems(selectedWarehouse._id)">
+                        @change="getItems(selectedWarehouse._id)"
+                        v-if="selectedWarehouse">
                         <option :value="warehouse" v-for="warehouse in warehouses" :key="warehouse._id" :selected="warehouse._id == selectedWarehouse._id">
                             {{ warehouse.name }}
                         </option>
