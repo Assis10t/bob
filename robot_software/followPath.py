@@ -18,9 +18,9 @@ class FollowPath:
             print(direction, distance)
             # direction move in forwards axis or side axis
             if direction == 'forward':
-                line_follower.run_forwards(distance, False)
+                line_follower.run_forward(distance, direction)
             elif direction == 'backward':
-                line_follower.run_forwards(distance, True)
+                line_follower.run_backward(distance, direction)
             elif direction == 'left':
                 line_follower.run_sideways(distance, False)
             elif direction == 'right':
@@ -44,9 +44,6 @@ class FollowPath:
 # Main function
 if __name__ == "__main__":
     path_follower = FollowPath()
-    # X = forwards
-    # Y = sideways
-    # G = grab
     current_path = [('left', 1), ('forward', 2), ('backward', 2), ('left',2), ('forward', 4), ('right', 2),
                     ('backward', 4), ('right', 1)]
     #current_path = [('Y', 1), ('X', 2), ('G', 0), ('X', -1), ('G', 0), ('X', 3), ('Y', 1), ('G', 0), ('X', -4),
