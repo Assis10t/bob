@@ -15,8 +15,10 @@ class Control:
         self.previous_error = 0
 
     def calculate_torque(self, lval, rval):
-        error = lval - rval - 10
-        logging.info("PID error: ", error)
+        error = lval - rval
+        print('lval', lval)
+        print('rval', rval)
+        #print("PID error: ", error)
         self.integral += (error * self.dt)
         derivative = (error - self.previous_error) / self.dt
         self.previous_error = error
@@ -26,5 +28,5 @@ class Control:
         # u negative: too dark,   turn left
         # u is torque (See IVR lecture on Control)
         u = (self.KP * error) + (self.KI * self.integral) + (self.KD * derivative)
-        logging.info("PID torque: ", u)
+        #print("PID torque: ", u)
         return u

@@ -17,6 +17,8 @@ class FollowLine:
     BLUE = 2  # blue reading from colour sensor in COL-COLOR mode
     GREEN = 3  # green reading from colour sensor in COL-COLOR mode
 
+    REVERSE = 1 # 1 if Bob is reversing, -1 if not
+
     # Constructor
     def __init__(self):
         self.btn = ev3.Button()
@@ -42,11 +44,11 @@ class FollowLine:
 
         self.consecutive_colours = 0  # counter for consecutive colour readings
         self.ignore_blue = False  # when switching from sideways to forwards
-        self.ignore_green = False  # when switching from fowards to sideways
+        self.ignore_green = False  # when switching from forwards to sideways
         # self.number_of_markers = 0  # at which marker it should stop
 
     def detect_marking(self, colour_left, colour_right):
-        print(colour_left, colour_right)
+        #print(colour_left, colour_right)
         if (colour_right == self.BLUE and colour_left == self.BLUE) \
                 or (colour_right == self.GREEN and colour_left == self.GREEN):
             self.consecutive_colours += 1
@@ -107,17 +109,19 @@ class FollowLine:
             # Set the speed of the motors
             speed_left = self.limit_speed(self.MOTOR_SPEED + torque)
             speed_right = self.limit_speed(self.MOTOR_SPEED - torque)
+            print('Speed left:', speed_left)
+            print('Speed right:', speed_right)
 
             # run motors
-            motor_left.run_timed(time_sp=self.DT, speed_sp=-speed_left)
-            motor_right.run_timed(time_sp=self.DT, speed_sp=-speed_right)
+            motor_left.run_timed(time_sp=self.DT, speed_sp=speed_left * self.REVERSE)
+            motor_right.run_timed(time_sp=self.DT, speed_sp=speed_right * self.REVERSE)
             sleep(self.DT / 1000)
 
             # Check markers
             # Wait before checking for colour again
             if time() - start_time > self.MARKING_INTERVAL:
                 # returns 3 if green, 2 if blue
-                marker_colour = self.detect_marking(colour_left, colour_right)
+                marker_colour = self.detect_marking(colour_left.value(), colour_right.value())
                 #print(marker_colour)
                 if marker_colour == self.GREEN:
                     # stop after given number of greens
@@ -191,6 +195,7 @@ class FollowLine:
 
     # move forward
     def run_forward(self, distance, direction):
+        self.REVERSE = -1
         # set colour sensor modes and check if successful
         if self.set_cs_modes('forward'):
             # modes set successfully
@@ -202,8 +207,9 @@ class FollowLine:
             return
 
     def run_backward(self, distance, direction):
+        self.REVERSE = 1
         # set colour sensor modes and check if successful
-        if self.set_cs_modes('forward'):
+        if self.set_cs_modes('backward'):
             # modes set successfully
             self.correct_trajectory(distance, self.csbr, self.csbl, self.csfr, self.csfl, self.rm, self.lm)
         else:
@@ -218,7 +224,7 @@ class FollowLine:
             if time_off_line == 0:
                 time_off_line = time()
             # if off line for more than a second move side-to-side until line is found
-            print(time() - time_off_line)
+            #print(time() - time_off_line)
             if time() - time_off_line > 0.5:
                 correction_speed = 200
                 correction_time = 100
@@ -240,7 +246,7 @@ class FollowLine:
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
-        ev3.Sound.speak("bruh").wait()
+        ev3.Sound.speak("whack").wait()
 
 
 # Main function
