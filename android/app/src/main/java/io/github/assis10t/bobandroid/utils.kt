@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.TypedValue
 import android.provider.SyncStateContract.Helpers.update
+import android.util.Base64
 import io.github.assis10t.bobandroid.pojo.Item
 import timber.log.Timber
 import java.security.NoSuchAlgorithmException
@@ -63,4 +64,11 @@ fun getCart(context: Context) = context
 fun clearCart(context: Context) {
     val preferences = context.getSharedPreferences("bob", Context.MODE_PRIVATE)
     preferences.edit().remove("cart").commit()
+}
+
+fun base64ToByteArray(str: String): ByteArray? {
+    //Removing data:image/jpg;base64, from the beginning.
+    val pureStr = str.substring(str.indexOf(",")+1)
+    val bytes = Base64.decode(pureStr, Base64.DEFAULT)
+    return bytes
 }
