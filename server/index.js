@@ -15,11 +15,12 @@ db.init()
         console.log('Initialized database connection.')
 
         if (FAKE_DATA) {
+            await db.dropDatabase()
             await utils.loadDBwithData(db, fakeData)
             console.log('Initialized database with fake data.')
         }
 
-        app.get('/commit', (req, res) => {
+        app.get('/api/commit', (req, res) => {
             try {
                 const commit = fs.readFileSync('./COMMIT', 'utf8').trim()
                 res.redirect('https://github.com/Assis10t/assis10t/commit/' + commit)
@@ -28,11 +29,11 @@ db.init()
             }
         })
 
-        app.get('/reset', async (req, res) => {
+        app.get('/api/reset', async (req, res) => {
             await db.dropDatabase()
             if (FAKE_DATA) {
                 await utils.loadDBwithData(db, fakeData)
-                res.send('Loaded with fake data.')
+                res.send('Deleted all data and reloaded with fake data.')
             } else {
                 res.send('Deleted all data.')
             }
