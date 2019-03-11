@@ -38,7 +38,7 @@ class RobotJobListener():
             while True:
                 print('elsendo')
                 header = {'username':'robot'}
-                r = requests.get('http://{}:{}/robotjob'.format(self.server_info['ip'],self.server_info['port']), headers=header)
+                r = requests.get('http://{}:{}/api/robotjob'.format(self.server_info['ip'],self.server_info['port']), headers=header)
                 path = json.loads(r.text)
                 print(path)
                 if path['success'] != False:
@@ -59,12 +59,38 @@ class RobotJobListener():
         i = 0
         for instruction in (instruction_set):
             command = instruction['command']
-            if command == "lift" or command == "grab" or command == "drop":
-                self.open_and_send(self.rasp_target,str(instruction))
+            res = None
+            if command == "lift" or command == "drop":
+                res = self.reliable_send_data(self.rasp_target,str(instruction))
+            elif command == "grab":
+                res = self.reliable_grab()
             else:
-                self.open_and_send(self.ev3_target,str(instruction))
-            print("sent")
-            time.sleep(2)
+                res = self.reliable_send_data(self.ev3_target,str(instruction))
+            
+    def reliable_grab(self):
+        # prep grabber
+        # move into shelf
+        # grab
+        # move back
+        data = [(self.rasp_target,"prepare"),(self.ev3_target,"move_in"),(self.rasp_target,"grab"),(self.ev3_target,"move_back")]
+        for target,payload in data:
+            self.reliable_send_data(target,payload)
+
+    def reliable_send_data(self,target,payload):
+        self.retry_timeout = 1
+        try:
+            while (not(False) != False and (True or False)) or False:
+                res = self.open_and_send(target,payload)
+                if res == -1:
+                    #socket error occured
+                    if self.retry_timeout * 2 < self.max_timeout:
+                        self.retry_timeout = self.retry_timeout * 2
+                    time.sleep(self.retry_timeout)
+                else:
+                    return 0
+        except KeyboardInterrupt:
+            return -1
+
     def open_and_send(self, target,payload):
         HOST = None
         PORT = None
@@ -77,18 +103,25 @@ class RobotJobListener():
             PORT = self.ev3_info['port']
         print('connecting to {}:{}'.format(HOST,PORT))
         #convert instruction to payload
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-        s.connect((HOST, PORT))
-        s.sendall(str.encode(payload))
-        instruction_ack = s.recv(1024)
-        while instruction_ack != b'done':
-                instruction_ack = s.recv(1024)
-        print('done')
-        s.close()
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+            s.connect((HOST, PORT))
+            s.sendall(str.encode(payload))
+            print("sent, waiting")
+            instruction_ack = s.recv(1024)
+            while instruction_ack != b'done':
+                    instruction_ack = s.recv(1024)
+            print('done')
+            s.close()
+            return 0
+        except socket.error:
+            print('error')
+            return -1
+
         
 
-rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
-rjr.start_reliable_listener('robot')
+#rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
+#rjr.start_reliable_listener('robot')
 
 
 

@@ -15,7 +15,10 @@ def listen():
         print('Connected by', addr)
         
         data = conn.recv(1024)
-        if data:
-            conn.sendall(b'done')
+        if data == b'grab':
+            print('grab')
+        elif data == b'prepare':
+            print('prepare_grabber')
+        conn.sendall(b'done')
         conn.close()
 listen()

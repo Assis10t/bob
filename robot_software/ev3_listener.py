@@ -25,12 +25,14 @@ while True:
     if data:
 
         str_instruction = data.decode('utf-8')
-        print(str_instruction)
         str_instruction = str_instruction.replace('\'', '\"')
         str_instruction = str_instruction.replace('u\"', '\"')
         print(str_instruction)
+        #TODO: fix follow path so that it can move in or make a new function to handle it.
         #robot = FollowPath()
         #robot.start(extract(json.loads(str_instruction)))
+        #MoveIn()
+        #
         print('done')
         conn.sendall(b'done')
         conn.close()
