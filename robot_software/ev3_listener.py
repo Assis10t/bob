@@ -3,7 +3,7 @@
 import socket
 #from followPath import FollowPath
 from bobTranslation import extract
-from followLine import FollowLine
+#from followLine import FollowLine
 
 import json
  # Get local machine name
@@ -31,16 +31,23 @@ while True:
         print(str_instruction)
         #TODO: fix follow path so that it can move in or make a new function to handle it.
         #MoveIn()
+        """
         if str_instruction == 'move_in':
-            line_follower = FollowLine()
-            line_follower.move_toward_shelf()
+            continue
+            #line_follower = FollowLine()
+            #line_follower.move_toward_shelf()
         elif str_instruction == 'move_back':
-            line_follower = FollowLine()
-            line_follower.move_away_from_shelf()
+            continue
+            #line_follower = FollowLine()
+            #line_follower.move_away_from_shelf()
+        elif str_instruction == 'stop':
+            #stop moving in
+            continue
         else:
-            robot = FollowPath()
-            robot.start(extract(json.loads(str_instruction)))
-
+            #robot = FollowPath()
+            #robot.start(extract(json.loads(str_instruction)))
+            continue
+        """
 
         print('done')
         conn.sendall(b'done')

@@ -19,6 +19,11 @@ def listen():
             print('grab')
         elif data == b'prepare':
             print('prepare_grabber')
+        elif data == b'wait_for_bump':
+            print('wait for bump')
+            raw_input()
+            print("BUMP!")
+        
         conn.sendall(b'done')
         conn.close()
 listen()

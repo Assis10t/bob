@@ -68,13 +68,13 @@ class RobotJobListener():
                 res = self.reliable_send_data(self.ev3_target,str(instruction))
             
     def reliable_grab(self):
-        # prep grabber
-        # move into shelf
-        # grab
-        # move back
-        data = [(self.rasp_target,"prepare"),(self.ev3_target,"move_in"),(self.rasp_target,"grab"),(self.ev3_target,"move_back")]
-        for target,payload in data:
-            self.reliable_send_data(target,payload)
+       
+        self.reliable_send_data(self.rasp_target,"prepare")
+        self.reliable_send_data(self.ev3_target,"move_in")
+        self.reliable_send_data(self.rasp_target,"wait_for_bump")
+        self.reliable_send_data(self.ev3_target,"stop_shelf")
+        self.reliable_send_data(self.rasp_target,"grab")
+        self.reliable_send_data(self.ev3_target,"move_out")
 
     def reliable_send_data(self,target,payload):
         self.retry_timeout = 1
@@ -120,8 +120,8 @@ class RobotJobListener():
 
         
 
-#rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
-#rjr.start_reliable_listener('robot')
+rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
+rjr.start_reliable_listener('robot')
 
 
 
