@@ -16,7 +16,7 @@ import javax.jmdns.JmDNS
 import javax.jmdns.ServiceEvent
 import javax.jmdns.ServiceListener
 
-// Using API level v2
+// Using API level v3
 
 class ServerConnection {
     companion object {
