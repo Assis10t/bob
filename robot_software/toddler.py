@@ -41,32 +41,30 @@ class Toddler:
         self.mc = IO.motor_control
         self.sc = IO.servo_control
         self.grabber = Grabber(self.mc, self.MOTOR_PORT, self.sc)
-        self.grabber.grab()
-        self.grabber.prepare_grabber()
         #self.mc.setMotor(self.MOTOR_PORT, 100)
         #time.sleep(3)
         #self.mc.stopMotors()
 
-    def listen(self):
+    def listen():
         PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         HOST = socket.gethostbyname(socket.gethostname())
-        s.bind(('192.168.105.139', PORT))
-        print("Socket listening on {}:{}".format('192.168.105.139' , PORT))
-        s.listen(1)
-        conn, addr = s.accept()
-        c = conn
-        print('Connected by', addr)
+        s.bind((HOST, PORT))
+        print("Listening on {}:{}".format(HOST, PORT))
+        while True:
+            s.listen(1)
+            conn, addr = s.accept()
 
-        data = conn.recv(1024)
-        print('Socket data' + data)
-        if data:
-            print("Data != False")
-            self.grabber.prepare_grabber()
-            self.grabber.grab()
+            print('Connected by', addr)
+
+            data = conn.recv(1024)
+            if data == b'grab':
+                self.grabber.grab()
+            elif data == b'prepare':
+                self.grabber.prepare_grabber()
             conn.sendall(b'done')
-        conn.close()
+            conn.close()
 
     def control(self):
         try:
