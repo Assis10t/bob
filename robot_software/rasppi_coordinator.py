@@ -5,10 +5,9 @@ import sys
 import requests
 import json
 import time
-from rasppi_listener import Listener
 from threading import Thread
 from time import sleep
-from robot_software.tcp.bobTranslation import extract
+from bobTranslation import extract
 
 
 class RobotJobListener():
@@ -19,6 +18,21 @@ class RobotJobListener():
         self.rasp_target = 'ra'
         self.ev3_target = 'ev'
         self.socket_listener = None
+        self.retry_timeout = 1
+        self.max_timeout = 16
+    def start_reliable_listener(self,username):
+        try:
+            while True:
+                res = self.listen_to_server(username)
+                if res == -2:
+                    break
+                elif res == -1:
+                    if self.retry_timeout * 2 <= self.max_timeout:
+                        self.retry_timeout = self.retry_timeout * 2
+                    print("Failed to connect, retrying in {} seconds".format(self.retry_timeout))
+                    time.sleep(self.retry_timeout)
+        except KeyboardInterrupt:
+           return 
     def listen_to_server(self,username):
         try:
             while True:
@@ -31,10 +45,14 @@ class RobotJobListener():
                     print(path)
                     if path['job'] != []:
                         self.job_handler(path['job']['instruction_set'])
+                self.retry_timeout = 1
                 sleep(5)
         except KeyboardInterrupt:
             print('Stop!')
-            return
+            return -2
+        except requests.exceptions.ConnectionError:
+            return -1
+
             
     def job_handler(self,instruction_set):
         # TODO, open this on a new thread
@@ -68,9 +86,9 @@ class RobotJobListener():
         print('done')
         s.close()
         
-        
-rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.139',65432),('192.168.105.94',65432))
-rjr.listen_to_server('robot')
+
+rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
+rjr.start_reliable_listener('robot')
 
 
 
