@@ -36,10 +36,10 @@ class WarehouseActivity : ActivityWithLoginMenu() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.title = warehouseName
 
-        container.isEnabled = false
+        container.setOnRefreshListener { refreshItems() }
         item_list.layoutManager = GridLayoutManager(this, 2)
         item_list.adapter = ItemAdapter()
-//        (item_list.adapter as ItemAdapter).updateItems(listOf(
+//        (item_list.adapter as ItemAdapter).updateOrders(listOf(
 //            Item("some_id2", "some_id", "My Item", "my_img", null, null, null, 1.25)
 //        )) //TODO: Remove this.
         view_cart.setOnClickListener {

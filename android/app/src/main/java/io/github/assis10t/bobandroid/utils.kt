@@ -9,6 +9,7 @@ import io.github.assis10t.bobandroid.pojo.Item
 import timber.log.Timber
 import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.util.*
 
 
@@ -42,8 +43,13 @@ fun md5(s: String): String {
 }
 
 fun getCurrentTimeString(): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.UK)
+    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.UK)
     return sdf.format(Date())
+}
+
+fun parseISODate(str: String): Date {
+    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.UK)
+    return sdf.parse(str)
 }
 
 fun addToCart(context: Context, i: Item) {
