@@ -24,6 +24,7 @@ class RobotJobListener():
         try:
             while True:
                 res = self.listen_to_server(username)
+                print("RES {}".format(res))
                 if res == -2:
                     break
                 elif res == -1:
@@ -32,7 +33,8 @@ class RobotJobListener():
                     print("Failed to connect, retrying in {} seconds".format(self.retry_timeout))
                     time.sleep(self.retry_timeout)
         except KeyboardInterrupt:
-           return 
+            print("STOP!!!!!")
+            return
     def listen_to_server(self,username):
         try:
             while True:
@@ -53,7 +55,7 @@ class RobotJobListener():
         except requests.exceptions.ConnectionError:
             return -1
 
-            
+
     def job_handler(self,instruction_set):
         # TODO, open this on a new thread
         i = 0
@@ -66,9 +68,9 @@ class RobotJobListener():
                 res = self.reliable_grab()
             else:
                 res = self.reliable_send_data(self.ev3_target,str(instruction))
-            
+
     def reliable_grab(self):
-       
+
         self.reliable_send_data(self.rasp_target,"prepare")
         self.reliable_send_data(self.ev3_target,"move_in")
         self.reliable_send_data(self.rasp_target,"wait_for_bump")
@@ -97,14 +99,14 @@ class RobotJobListener():
         if target == self.rasp_target:
             HOST = self.rasp_info['ip']
             PORT = self.rasp_info['port']
-            
+
         elif target == self.ev3_target:
             HOST = self.ev3_info['ip']
             PORT = self.ev3_info['port']
         print('connecting to {}:{}'.format(HOST,PORT))
         #convert instruction to payload
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((HOST, PORT))
             s.sendall(str.encode(payload))
             print("sent, waiting")
@@ -118,12 +120,7 @@ class RobotJobListener():
             print('error')
             return -1
 
-        
-
-rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
-rjr.start_reliable_listener('robot')
 
 
-
-    
-
+#rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
+#rjr.start_reliable_listener('robot')

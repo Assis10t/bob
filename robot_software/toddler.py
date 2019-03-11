@@ -7,6 +7,7 @@ import socket
 from threading import Thread
 from iotools import IOTools
 from grabber import Grabber
+from rasppi_coordinator import RobotJobListener
 
 
 class Logger(object):
@@ -27,6 +28,7 @@ class Logger(object):
     def flush(self):
         pass
 
+halt = {'sop':False}
 
 class Toddler:
 
@@ -45,37 +47,49 @@ class Toddler:
         #time.sleep(3)
         #self.mc.stopMotors()
 
-    def listen():
-        PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+    def listen(self):
+        global halt
+        try:
+            PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        HOST = socket.gethostbyname(socket.gethostname())
-        s.bind((HOST, PORT))
-        print("Listening on {}:{}".format(HOST, PORT))
-        while True:
-            s.listen(1)
-            conn, addr = s.accept()
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            #HOST = socket.gethostbyname(socket.gethostname())
+            HOST = '192.168.105.139'
+            s.bind(('192.168.105.139', PORT))
+            print("Listening on {}:{}".format(HOST, PORT))
+            while not(halt['sop']):
+                s.listen(1)
+                conn, addr = s.accept()
 
-            print('Connected by', addr)
+                print('Connected by', addr)
 
-            data = conn.recv(1024)
-            if data == b'grab':
-                self.grabber.grab()
-            elif data == b'prepare':
-                self.grabber.prepare_grabber()
-            conn.sendall(b'done')
-            conn.close()
+                data = conn.recv(1024)
+                if data == b'grab':
+                    self.grabber.grab()
+                elif data == b'prepare':
+                    self.grabber.prepare_grabber()
+                elif data == b'wait_for_bump':
+                    while(self.getInputs()[0] == 0 or self.getInputs()[1] == 0):
+                        print("Wait for bump")
+                    print("bump")
+                conn.sendall(b'done')
+                conn.close()
+        except KeyboardInterrupt:
+            return
 
     def control(self):
+        global halt
         try:
             thread = Thread(target=self.listen)
+            thread.daemon = True
             thread.start()
 
+            rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.139',65432),('192.168.105.38',65433))
+            rjr.start_reliable_listener('robot')
             # start pinging the server
             # server, rasppi, ev3
-
-
         except KeyboardInterrupt:
+            halt['sop'] = True
             return
 
     def vision(self):
@@ -90,10 +104,4 @@ if __name__ == '__main__':
     sys.stdout = Logger(onRobot)
     sys.stderr = sys.stdout
     t = Toddler(onRobot)
-    try:
-        while 1:
-            t.listen()
-    except KeyboardInterrupt:
-        print("stop")
-
-
+    t.control()
