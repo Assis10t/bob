@@ -130,7 +130,7 @@ Instruction {
 | `GET` | `/warehouse/:warehouseId/robot` | `Merchant` | Gets the state of the robot(s). |
 | `GET` | `/robot` | `Robot` | Get details of the current Robot. |
 | `PUT` | `/robot/status` | `Robot` | Update Status of robot
-| `GET` | `/robot/:robotId` | `Merchant` | Get details about the robot with given `robotId` |
+| `GET` | `/robot/:username` | `Merchant` | Get details about the robot with given `username` |
 | `PUT` | `/robot/status` | `Robot` | Update Status of robot
 | `POST` | `/robot/:robotId/sethome` | `Merchant` | Set the home location of the robot. |
 | `GET` | `/robotjob` | `Robot` | Gets the next job the robot needs to do. |
@@ -292,7 +292,7 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 }
 ```
 
-#### `GET /robot/:robotId`
+#### `GET /robot/:username`
 ```javascript
 ===== Output =====
 {
