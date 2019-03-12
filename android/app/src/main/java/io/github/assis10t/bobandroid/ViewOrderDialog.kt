@@ -46,7 +46,7 @@ class ViewOrderDialog(context: Context, val order: Order): Dialog(context) {
                 if (order.status == Order.Status.COMPLETE)
                     View.VISIBLE
                 else
-                    View.GONE
+                    View.VISIBLE //TODO: Change to View.GONE
 
         val totalAmount =
             if (order.items.isEmpty())
@@ -59,9 +59,8 @@ class ViewOrderDialog(context: Context, val order: Order): Dialog(context) {
         total.text = "£${"%.2f".format(totalAmount)}"
 
 
-
         view_qr.setOnClickListener {
-            TODO()
+            ViewQRDialog(context, order).show()
         }
 
         get_directions.setOnClickListener {
