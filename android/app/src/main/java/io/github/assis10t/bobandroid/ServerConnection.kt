@@ -61,7 +61,7 @@ class ServerConnection {
 
         fun zeroconfBypass(address: String) {
             Timber.d("Bypassed zeroconf: $address")
-            serverAddress = "http://$address:9000"
+            serverAddress = address
             onConnectedListeners.forEach { it(serverAddress!!) }
             onConnectedListeners.clear()
         }
@@ -157,6 +157,11 @@ class ServerConnection {
                         onGetWarehouse(error, null)
                     } else {
                         val response = gson.fromJson(str!!, GetWarehouseResponse::class.java)
+                        val warehouse = response.warehouse
+                        if (warehouse != null) {
+                            // Remove items that are out of stock.
+                            warehouse.items = warehouse.items.filter { it.quantity != null && it.quantity > 0 }
+                        }
                         onGetWarehouse(null, response.warehouse)
                     }
                 }

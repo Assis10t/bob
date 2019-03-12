@@ -5,17 +5,25 @@ const cors = require('cors')
 
 const auth = require('./auth')
 
-const API_LEVEL = 'v2'
+const API_LEVEL = 'v3'
 
 const app = express()
 
 app.use(bodyParser.json({ limit: '50mb' }))
 
-app.use(express.static('../website/dist'))
+app.use(express.static('./public'))
 
+const whitelist = ['http://localhost:3000', 'http://sdp-10-beta.herokuapp.com', 'https://sdp-10-beta.herokuapp.com']
 app.use(
     cors({
-        origin: 'http://localhost:3000',
+        origin: (origin, callback) => {
+            if (whitelist.indexOf(origin) > -1) {
+                callback(null, true)
+            } else {
+                console.log(origin, 'is not allowed by CORS. Bypassing anyway.')
+                callback(null, true)
+            }
+        },
         credentials: true
     })
 )
@@ -34,6 +42,14 @@ app.get(
     auth.customer((req, res, next) =>
         model
             .getOrders(req.user._id)
+            .then(async orders => {
+                const warehouses = await Promise.all(orders.map(order => model.getWarehouseById(order.warehouseId)))
+                const newOrders = orders.map((order, i) => ({
+                    ...order,
+                    warehouse: warehouses[i]
+                }))
+                return newOrders
+            })
             .then(orders => res.json({ success: true, orders }))
             .catch(next)
     )
@@ -45,8 +61,11 @@ app.get(
         model
             .getOrderById(req.params.orderId)
             .then(order => {
-                if (order && req.user._id.equals(order.userId)) res.json({ success: true, order })
-                else if (order)
+                if (order && req.user._id.equals(order.userId)) {
+                    model.getWarehouseById(order.warehouseId).then(warehouse => {
+                        res.json({ success: true, order: { ...order, warehouse } })
+                    })
+                } else if (order)
                     res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
                 else res.status(404).json({ success: true, order: null })
             })
@@ -171,6 +190,53 @@ app.get(
             .catch(next)
     })
 )
+
+app.get(
+    '/api/warehouse/:warehouseId/orders/:orderId',
+    auth.merchant((req, res, next) => {
+        model
+            .getOrderById(req.params.orderId)
+            .then(order => {
+                if (order && req.params.warehouseId === order.warehouseId) {
+                    model.getWarehouseById(order.warehouseId).then(warehouse => {
+                        if (req.user._id.equals(warehouse.merchantId)) {
+                            res.json({ success: true, order: { ...order, warehouse } })
+                        } else {
+                            res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
+                        }
+                    })
+                } else if (order)
+                    res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
+                else res.status(404).json({ success: true, order: null })
+            })
+            .catch(next)
+    })
+)
+
+app.post(
+    '/api/warehouse/:warehouseId/orders/:orderId',
+    auth.merchant((req, res, next) =>
+        model
+            .getOrderById(req.params.orderId)
+            .then(order => {
+                if (order && req.params.warehouseId === order.warehouseId) {
+                    model.getWarehouseById(order.warehouseId).then(warehouse => {
+                        if (req.user._id.equals(warehouse.merchantId)) {
+                            model
+                                .setOrderStatus(req.params.orderId, req.body.status)
+                                .then(res.json({ success: true, order: { ...order, warehouse } }))
+                        } else {
+                            res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
+                        }
+                    })
+                } else if (order)
+                    res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
+                else res.status(404).json({ success: false, error: 'Order not found.' })
+            })
+            .catch(next)
+    )
+)
+
 app.put('/api/turnon/:nOfMarkers', (req, res, next) => {
     const markers = req.params.nOfMarkers
     model
