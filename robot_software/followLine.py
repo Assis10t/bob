@@ -221,16 +221,16 @@ class FollowLine:
         return time_off_line
 
     def move_toward_shelf(self):
-        self.cm.run_timed(time_sp=self.DT, speed_sp=-self.SIDEWAYS_SPEED)
-        sleep(self.DT / 1000)
+        self.cm.run_timed(time_sp=self.DT*50, speed_sp=-self.SIDEWAYS_SPEED)
+        sleep(self.DT*50.0/1000.0)
         return
 
     def move_away_from_shelf(self):
-        while not self.shut_down:
-            self.cm.run_timed(time_sp=self.DT, speed_sp=self.SIDEWAYS_SPEED)
-            sleep(self.DT / 1000)
-            if self.detect_marking(self.csbl.value(), self.csbl.value(), self.BLACK):
-                return
+
+        self.cm.run_timed(time_sp=1000, speed_sp=self.SIDEWAYS_SPEED)
+        sleep(1)
+        #if self.detect_marking(self.csbl.value(), self.csbl.value(), self.BLACK):
+        return
 
     def stop_shelf_movement(self):
         self.cm.stop(stop_action='hold')
@@ -240,8 +240,3 @@ class FollowLine:
         self.rm.stop()
         self.lm.stop()
         ev3.Sound.speak("whack").wait()
-
-
-# Main function
-if __name__ == "__main__":
-    robot = FollowLine()

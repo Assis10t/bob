@@ -34,7 +34,7 @@ class Grabber():
 
         time.sleep(self.SERVO_TIME)
         self.mc.setMotor(self.mc_id, -self.MC_SPEED)
-        time.sleep(self.OUTWARD_SCOOP_TIME)
+        time.sleep(self.OUTWARD_SCOOP_TIME+0.07)
         self.mc.stopMotors()
 
         self.sc.disengage()

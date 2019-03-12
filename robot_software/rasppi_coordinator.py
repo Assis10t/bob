@@ -9,6 +9,7 @@ from threading import Thread
 from time import sleep
 from bobTranslation import extract
 
+thread_manager = {'bumped':False}
 
 class RobotJobListener():
     def __init__(self,server_info, rasp_info, ev3_info):
@@ -70,13 +71,30 @@ class RobotJobListener():
                 res = self.reliable_send_data(self.ev3_target,str(instruction))
 
     def reliable_grab(self):
+        try:
+            global thread_manager
+            thread_manager['bumped'] = False
+            self.reliable_send_data(self.rasp_target,"prepare")
+            move_in_thread = Thread(target = self.move_until_bump)
+            move_in_thread.daemon = True
+            move_in_thread.start()
 
-        self.reliable_send_data(self.rasp_target,"prepare")
-        self.reliable_send_data(self.ev3_target,"move_in")
-        self.reliable_send_data(self.rasp_target,"wait_for_bump")
-        self.reliable_send_data(self.ev3_target,"stop_shelf")
-        self.reliable_send_data(self.rasp_target,"grab")
-        self.reliable_send_data(self.ev3_target,"move_out")
+            self.reliable_send_data(self.rasp_target,"wait_for_bump")
+            print('bump!')
+            thread_manager['bumped'] = True
+            #self.reliable_send_data(self.ev3_target,"stop_shelf")
+            self.reliable_send_data(self.rasp_target,"grab")
+            self.reliable_send_data(self.ev3_target,"move_out")
+            return
+        except KeyboardInterrupt:
+            thread_manager['bumped'] = True
+            return
+
+    def move_until_bump(self):
+        global thread_manager
+        while not(thread_manager['bumped']):
+            self.reliable_send_data(self.ev3_target,"move_in")
+
 
     def reliable_send_data(self,target,payload):
         self.retry_timeout = 1

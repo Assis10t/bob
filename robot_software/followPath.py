@@ -17,6 +17,7 @@ class FollowPath:
         self.last_direction = 'forward' # saves previous direction Bob moved in
 
     def go(self, path):
+        print(path)
         line_follower = FollowLine()
         for direction, distance in path:
             if line_follower.set_cs_modes(direction):
@@ -43,7 +44,7 @@ class FollowPath:
                 else:
                     ev3.Sound.speak("Wrong command given. What does", direction, "mean?").wait()
         line_follower.stop()
-        
+
 
     # TODO: possibly move start and stop to FollowPath or move correct trajectory to a separate file instead
     def start(self, path):
@@ -53,12 +54,3 @@ class FollowPath:
             ev3.Sound.speak("No instructions given").wait()
         else:
             self.go(path)
-            
-
-
-# Main function
-if __name__ == "__main__":
-    path_follower = FollowPath()
-    #current_path = [('left', 1), ('forward', 2), ('backward', 2), ('left',2), ('forward', 4), ('right', 2), ('backward', 4), ('right', 1)]
-    current_path = [('right', 3)]
-    path_follower.start(current_path)

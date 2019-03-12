@@ -41,6 +41,7 @@ class Toddler:
         self.getInputs = IO.interface_kit.getInputs
         self.getSensors = IO.interface_kit.getSensors
         self.mc = IO.motor_control
+        self.mc.stopMotors()
         self.sc = IO.servo_control
         self.grabber = Grabber(self.mc, self.MOTOR_PORT, self.sc)
         #self.mc.setMotor(self.MOTOR_PORT, 100)
@@ -84,7 +85,7 @@ class Toddler:
             thread.daemon = True
             thread.start()
 
-            rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.139',65432),('192.168.105.38',65433))
+            rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.139',65432),('192.168.105.94',65433))
             rjr.start_reliable_listener('robot')
             # start pinging the server
             # server, rasppi, ev3
