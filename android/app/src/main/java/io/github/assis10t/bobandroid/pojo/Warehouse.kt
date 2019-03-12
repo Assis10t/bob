@@ -7,7 +7,7 @@ class Warehouse (
     val name: String = "Unnamed Warehouse",
     val merchantId: String? = null,
     val location: Location? = null,
-    val items: List<Item>? = null
+    var items: List<Item> = listOf()
 ) {
     companion object {
         class Location(
