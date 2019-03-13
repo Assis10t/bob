@@ -95,6 +95,7 @@
                         </div>
                     </transition>
                 </div>
+
                 <div class="box is-flex direction-column align-center" v-else-if="completed">
                     <h3 class="has-text-centered p20-0 has-text-success">
                         Order has been successfully collected and completed!
@@ -211,7 +212,7 @@ export default {
             this.loading = true
 
             this.getOrders(this.selectedWarehouse._id)
-
+            
             this.orders.forEach(order => {
                 if (order._id == decodedString) {
                     setTimeout(() => {
