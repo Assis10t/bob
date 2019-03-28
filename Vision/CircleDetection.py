@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
+
 
 class CircleDetection:
-
     background_colour = 255
 
     # Change colour to match illumination
@@ -38,22 +39,48 @@ class CircleDetection:
 
         return mask, np.array([x, y])
 
+    def match_template(self, img):
+        template = cv2.imread('bob_logo.jpg', 0)
+        img2 = img.copy()
+        w, h = template.shape[::-1]
+
+        method = eval('cv2.TM_CCORR')
+
+
+
+        # Apply template Matching
+        res = cv2.matchTemplate(img, template, method)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        top_left = max_loc
+        bottom_right = (top_left[0] + w, top_left[1] + h)
+
+        cv2.rectangle(img, top_left, bottom_right, 255, 2)
+        plt.subplot(121), plt.imshow(res, cmap='gray')
+        plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
+        plt.subplot(122), plt.imshow(img, cmap='gray')
+        plt.title('Detected Point'), plt.xticks([]), plt.yticks([])
+        plt.show()
+
+        #cv2.imshow("bob", template)
+        #cv2.waitKey(0)
+
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
     circle_detector = CircleDetection()
 
-    for i in range(50):
+    for i in range(10):
         # Capture frame-by-frame
         ret, frame = cap.read()
         # frame dimensions 480 X 640 X 3
 
         frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        print("HSV {} BGR {}".format(frame_hsv[480/2][640/2],frame[480/2][640/2]))
-        cv2.imshow("frame", frame)
-        cv2.waitKey(0)
-
-        #mask, coordinates = circle_detector.detect_blue(frame)
-
-        #cv2.imshow("circle", mask)
+        frame_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        #print("HSV {} BGR {}".format(frame_hsv[479][639], frame[479][639]))
+        #cv2.imshow("frame", frame)
         #cv2.waitKey(0)
+        circle_detector.match_template(frame_grey)
+        # mask, coordinates = circle_detector.detect_blue(frame)
+
+        # cv2.imshow("circle", mask)
+        # cv2.waitKey(0)
