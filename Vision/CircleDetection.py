@@ -10,17 +10,19 @@ class CircleDetection:
     def normalise_rgb(self, target_colour):
         return self.background_colour * (target_colour / 255.0)
 
-    def coordinate_convert(self, pixels):
-        # Converts pixels into metres
-        return np.array([(pixels[0] - self.env.viewerSize / 2) / self.env.resolution,
-                         -(pixels[1] - self.env.viewerSize / 2) / self.env.resolution])
-
     def detect_blue(self, image):
         # Isolate the colour in the image as a binary image
-        colour = self.normalise_rgb(255)
-        lower_limit = colour - 100
-        upper_limit = colour + 100
-        mask = cv2.inRange(image, (lower_limit, 0, 0), (upper_limit, 100, 100))
+        #colour = self.normalise_rgb(255)
+        #lower_limit = colour - 100
+        #upper_limit = colour + 100
+
+        # define range of blue color in HSV
+        lower_blue = np.array([30, 50, 50])
+        upper_blue = np.array([50, 255, 255])
+
+        #mask = cv2.inRange(image, (lower_limit, 0, 0), (upper_limit, 100, 100))
+        # Threshold the HSV image to get only blue colors
+        mask = cv2.inRange(image, lower_blue, upper_blue)
         # detecting centre of circle
 
         kernel = np.ones((5, 5), np.uint8)
@@ -34,13 +36,15 @@ class CircleDetection:
 
         # Obtain the contours of the binary image
         _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        blob = contours[0]
-        (x, y), radius = cv2.minEnclosingCircle(contours[0])
+        try:
+            (x, y), radius = cv2.minEnclosingCircle(contours[0])
+        except:
+            (x, y) = (0, 0)
 
         return mask, np.array([x, y])
 
     def match_template(self, img):
-        template = cv2.imread('bob_logo.jpg', 0)
+        template = cv2.imread('star2.jpg', 0)
         img2 = img.copy()
         w, h = template.shape[::-1]
 
@@ -67,20 +71,24 @@ class CircleDetection:
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
+    #cap.set(10, 100); # brightness
+    #cap.set(11, 100); # contrast
+    #cap.set(12, 100); # saturation
     circle_detector = CircleDetection()
 
-    for i in range(10):
+    for i in range(50):
         # Capture frame-by-frame
         ret, frame = cap.read()
         # frame dimensions 480 X 640 X 3
 
         frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         frame_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        #print("HSV {} BGR {}".format(frame_hsv[479][639], frame[479][639]))
-        #cv2.imshow("frame", frame)
+        print("HSV {} BGR {}".format(frame_hsv[479][639], frame[479][639]))
+        # cv2.imshow("frame", frame)
         #cv2.waitKey(0)
-        circle_detector.match_template(frame_grey)
-        # mask, coordinates = circle_detector.detect_blue(frame)
 
-        # cv2.imshow("circle", mask)
-        # cv2.waitKey(0)
+        circle_detector.match_template(frame_grey)
+        #mask, coordinates = circle_detector.detect_blue(frame_hsv)
+
+        #cv2.imshow("circle", mask)
+        #cv2.waitKey(0)
