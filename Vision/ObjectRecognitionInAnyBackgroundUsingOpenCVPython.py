@@ -5,17 +5,18 @@ import numpy as np
 # http://jematoscv.blogspot.com/2014/05/matching-features-with-orb-using-opencv.html
 
 detector = cv2.ORB() #FeatureDetector_create("ORB")#cv2.xfeatures2d.SIFT_create() #cv2.SIFT()
-FLANN_INDEX_KDTREE = 0
-flannParam = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
-flann = cv2.FlannBasedMatcher(flannParam, {})
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-trainImg=cv2.imread("sweep.jpg")
+#trainImg=cv2.imread("sweep.jpg")
+trainImg=cv2.imread("star.png")
 gray = cv2.cvtColor(trainImg, cv2.COLOR_BGR2GRAY)
 trainKP, trainDesc = detector.detectAndCompute(trainImg, None)
 
 cam=cv2.VideoCapture(0)
-
+width = cam.get(3)
+height = cam.get(4)
+cam.set(3, width/2)
+cam.set(4, height/2)
 
 while True:
     ret, QueryImgBGR = cam.read()
@@ -45,12 +46,12 @@ while True:
         H, status = cv2.findHomography(tp, qp, cv2.RANSAC, 3.0)
 
         h, w, c = trainImg.shape
-        #trainBorder = np.float32([[[0, 0], [0, h-1], [w-1, h-1], [w-1, 0]]])
-        #queryBorder = cv2.perspectiveTransform(trainBorder, H)
-        #cv2.polylines(QueryImgBGR, [np.int32(queryBorder)], True, (0, 255, 0), 5)
+        trainBorder = np.float32([[[0, 0], [0, h-1], [w-1, h-1], [w-1, 0]]])
+        queryBorder = cv2.perspectiveTransform(trainBorder, H)
+        cv2.polylines(QueryImgBGR, [np.int32(queryBorder)], True, (0, 255, 0), 5)
     else:
         print "Not Enough match found- %d/%d"%(len(goodMatch), MIN_MATCH_COUNT)
-    #cv2.imshow('result', QueryImgBGR)
+    cv2.imshow('result', QueryImgBGR)
     if cv2.waitKey(10) == ord('q'):
         break
 cam.release()
