@@ -15,3 +15,15 @@ for i in range(50):
     plt.title('Edge Image'), plt.xticks([]), plt.yticks([])
 
     plt.show()
+
+    kernel = np.ones((5, 5), np.uint8)
+    # This applies a dilate that makes the binary region larger (the more iterations the larger it becomes)
+    mask = cv2.dilate(mask, kernel, iterations=5)
+
+    # Find contours
+    _, contours, _ = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Centre of largest contour
+    obj = contours[0]
+    centre = np.reshape(np.mean(obj, 0, dtype=np.int), 2)
+
