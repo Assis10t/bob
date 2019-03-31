@@ -3,8 +3,10 @@ import cv2
 
 cap = cv2.VideoCapture(0)
 
-cap_width = int(cap.get(3))
-cap_height = cap.get(4)
+cap_width = int(cap.get(3)/2.0)
+cap_height = int(cap.get(4)/2.0)
+cap.set(3, cap_width)
+cap.set(4, cap_height)
 
 DETECTION_THRESHOLD = 0.5 # percentage of window that has to be blue
 WINDOW_SIZE = int(cap_height/4)
@@ -33,13 +35,13 @@ while(True):
     cv2.waitKey(1)
 
     # chamfer matching
-    window = mask[-WINDOW_SIZE:] / 255
+    window = mask[-WINDOW_SIZE:]
     template = np.ones((WINDOW_SIZE, cap_width))
-    print(np.size(template[:,0]))
+    #print(WINDOW_SIZE)
     cv2.imshow('window', window)
     cv2.waitKey(1)
 
-    above_treshold = np.sum(window) > DETECTION_THRESHOLD * np.sum(template)
+    above_treshold = np.sum(window) / 255 > DETECTION_THRESHOLD * np.sum(template)
     print(above_treshold)
 
 
