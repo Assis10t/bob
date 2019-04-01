@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt
 
 cap = cv2.VideoCapture(0)
 cap_width = cap.get(3)
@@ -31,17 +30,19 @@ for i in range(5000):
     cv2.waitKey(1)
 
     # Find contours
-    _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    try:
-        # Centre of largest contour
-        obj = contours[0]
+    if len(contours) != 0:
+        # find the biggest area
+        obj = max(contours, key=cv2.contourArea)
         centre = np.reshape(np.mean(obj, 0, dtype=np.int), 2)
-    except IndexError:
+    else:
         print('no object visible')
         centre = [-1,-1]
 
-    if centre[0] > cap_width/3 and centre[0] < cap_width*2/3:
+    print(centre)
+
+    if centre[0] > cap_width/4 and centre[0] < cap_width*3/4:
         print('YEET')
     else:
         print('NEET')
