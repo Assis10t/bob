@@ -20,6 +20,7 @@ class FollowLine:
 
     CORRECTION_TIME = 100  # time in millisecond Bob moves away from blue line to correct sideways movement
     SIDEWAYS_SPEED = 1000   # how fast Bob moves when moving sideways
+    YEET_SPEED = 900  # how fast Bob moves when yeeting forward or backward
 
     # Constructor
     def __init__(self):
@@ -238,15 +239,29 @@ class FollowLine:
         
         self.cm.run_timed(time_sp=300, speed_sp=self.SIDEWAYS_SPEED)
         sleep(0.3)
-        if self.detect_marking(self.csbr, self.csbr, self.BLACK):
-            print("BLACK!")
-            return
+        #if self.detect_marking(self.csbr, self.csbr, self.BLACK):
+         #   print("BLACK!")
+          #  return
 
     def stop_shelf_movement(self):
         self.cm.stop(stop_action='brake')
+
+    def move_forward_for_a_little_bit(self):
+        # move forward for a while
+        print('moving forward for some time')
+        self.lm.run_timed(time_sp=1000, speed_sp=self.YEET_SPEED)
+        self.rm.run_timed(time_sp=1000, speed_sp=self.YEET_SPEED)
+        sleep(1)
+
+    def move_backward_for_a_little_bit(self):
+        # move forward for a while
+        print('moving forward for some time')
+        self.lm.run_timed(time_sp=1000, speed_sp=-self.YEET_SPEED)
+        self.rm.run_timed(time_sp=1000, speed_sp=-self.YEET_SPEED)
+        sleep(1)
 
     def stop(self):
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
-        #ev3.Sound.speak("whack").wait()
+        ev3.Sound.speak("Whack").wait()

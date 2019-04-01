@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 import cv2
 import numpy as np
 from followLine import FollowLine
@@ -5,6 +6,7 @@ from followLine import FollowLine
 cap = cv2.VideoCapture(0)
 cap_width = cap.get(3)
 cap_height = cap.get(4)
+OBJECT_THRESHOLD = 0.2 #
 
 for i in range(5000):
     # Capture frame-by-frame
@@ -44,10 +46,14 @@ for i in range(5000):
     print(centre)
     line_follower = FollowLine()
 
+    #if contours.[0[]
+
     if centre[0] < cap_width*1/4:
-        print('YEEET')
-    else:
-        print('NEET')
+        # TODO: move forward
+    elif centre[0] > cap_width*3/4:
+        # TODO: move backward
+
+
 
 
 
