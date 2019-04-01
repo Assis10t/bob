@@ -1,13 +1,22 @@
 package io.github.assis10t.bobandroid
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 
+@SuppressLint("Registered")
 open class ActivityWithLoginMenu: AppCompatActivity() {
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        ServerConnection().addAuthListener { invalidateOptionsMenu() }
+    }
+    
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (ServerConnection().isLoggedIn(this)) {
             menuInflater.inflate(R.menu.menu_logged_in, menu)
@@ -39,7 +48,7 @@ open class ActivityWithLoginMenu: AppCompatActivity() {
         // Handle item selection
         return when (item?.itemId) {
             R.id.login -> {
-                LoginDialog(this).show()
+                LoginDialog(this) { invalidateOptionsMenu() }.show()
                 true
             }
             R.id.logout -> {

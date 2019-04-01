@@ -19,6 +19,8 @@ import javax.jmdns.ServiceListener
 // Using API level v3
 
 class ServerConnection {
+    private val authListeners: MutableList<(loggedIn: Boolean) -> Unit> = mutableListOf()
+
     companion object {
         val SERVER_NAME = "assis10t"
         var serverAddress: String? = null
@@ -213,19 +215,22 @@ class ServerConnection {
         context.getSharedPreferences("bob", Context.MODE_PRIVATE).getString("username", null)
     }
 
+    @SuppressLint("ApplySharedPref")
     private val setCurrentUsername = { context: Context, username: String? ->
         if (username == null) {
             context
                 .getSharedPreferences("bob", Context.MODE_PRIVATE)
                 .edit()
                 .remove("username")
-                .apply()
+                .commit()
+            authListeners.forEach { it(false) }
         } else {
             context
                 .getSharedPreferences("bob", Context.MODE_PRIVATE)
                 .edit()
                 .putString("username", username)
-                .apply()
+                .commit()
+            authListeners.forEach { it(true) }
         }
     }
 
@@ -267,4 +272,12 @@ class ServerConnection {
         }
     }
     val register = registerFactory(httpClient, Gson())
+
+    fun addAuthListener(listener: (loggedIn: Boolean) -> Unit) {
+        authListeners.add(listener)
+    }
+
+    fun removeAuthListener(listener: (loggedIn: Boolean) -> Unit) {
+        authListeners.remove(listener)
+    }
 }
