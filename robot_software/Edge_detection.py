@@ -45,7 +45,7 @@ for i in range(5000):
     line_follower = FollowLine()
 
     if centre[0] < cap_width*1/4:
-        line_follower.
+        print('YEEET')
     else:
         print('NEET')
 
