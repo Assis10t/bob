@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from followLine import FollowLine
 
 cap = cv2.VideoCapture(0)
 cap_width = cap.get(3)
@@ -41,9 +42,10 @@ for i in range(5000):
         centre = [-1,-1]
 
     print(centre)
+    line_follower = FollowLine()
 
-    if centre[0] > cap_width/4 and centre[0] < cap_width*3/4:
-        print('YEET')
+    if centre[0] < cap_width*1/4:
+        line_follower.
     else:
         print('NEET')
 
