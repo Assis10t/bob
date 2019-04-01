@@ -19,14 +19,13 @@ import javax.jmdns.ServiceListener
 // Using API level v3
 
 class ServerConnection {
-    private val authListeners: MutableList<(loggedIn: Boolean) -> Unit> = mutableListOf()
-
     companion object {
         val SERVER_NAME = "assis10t"
         var serverAddress: String? = null
         val httpClient: OkHttpClient = OkHttpClient()
 
         val onConnectedListeners: MutableList<(serverAddress: String) -> Unit> = mutableListOf()
+        private val authListeners: MutableList<(loggedIn: Boolean) -> Unit> = mutableListOf()
 
         fun initialize() {
             doAsync {

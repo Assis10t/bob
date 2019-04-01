@@ -8,15 +8,26 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import timber.log.Timber
 
 @SuppressLint("Registered")
 open class ActivityWithLoginMenu: AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        ServerConnection().addAuthListener { invalidateOptionsMenu() }
+    private val authListener = { isLoggedIn: Boolean ->
+        Timber.d("Is logged in? $isLoggedIn")
+        invalidateOptionsMenu()
     }
-    
+
+    override fun onStart() {
+        super.onStart()
+        ServerConnection().addAuthListener(authListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        ServerConnection().removeAuthListener(authListener)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (ServerConnection().isLoggedIn(this)) {
             menuInflater.inflate(R.menu.menu_logged_in, menu)
