@@ -39,7 +39,7 @@ open class ActivityWithLoginMenu: AppCompatActivity() {
         // Handle item selection
         return when (item?.itemId) {
             R.id.login -> {
-                startActivity(Intent(this, LoginActivity::class.java))
+                LoginDialog(this).show()
                 true
             }
             R.id.logout -> {
