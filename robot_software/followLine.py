@@ -10,7 +10,7 @@ class FollowLine:
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
 
-    MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
+    MARKING_NUMBER = 1  # number of consecutive colour readings to detect marking
     MARKING_INTERVAL = 1.3  # time between marking checks in seconds
     reverse = False
 
@@ -164,25 +164,25 @@ class FollowLine:
 
         while not self.shut_down:
             # if a colour sensor is on a blue line, correct position to be between them again
-            if direction == 'left':
-                right_speed = self.SIDEWAYS_SPEED/2.0
-                left_speed = self.SIDEWAYS_SPEED
-            else:
-                right_speed = self.SIDEWAYS_SPEED
-                left_speed = self.SIDEWAYS_SPEED / 2.0
+            #if direction == 'left':
+             #   right_speed = self.SIDEWAYS_SPEED/2.0
+              #  left_speed = self.SIDEWAYS_SPEED
+            #else:
+             #   right_speed = self.SIDEWAYS_SPEED
+             #   left_speed = self.SIDEWAYS_SPEED / 2.0
             if self.detect_marking(self.csbl.value(), self.csbr.value(), self.BLUE):
                 # back sensors on blue line, so move forward for some time
-                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=left_speed)
-                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=right_speed)
+                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=self.SIDEWAYS_SPEED)
+                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=self.SIDEWAYS_SPEED)
                 sleep(self.CORRECTION_TIME / 1000)
             if self.detect_marking(self.csfl.value(), self.csfr.value(), self.BLUE):
                 # front sensors on blue line, so move backward for some time
 
-                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-left_speed)
-                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-right_speed)
+                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-self.SIDEWAYS_SPEED)
+                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-self.SIDEWAYS_SPEED)
                 sleep(self.CORRECTION_TIME / 1000)
 
-            # colour sensor for marking detection needs to be at front or back dependng on the last direction
+            # colour sensor for marking detection needs to be at front or back depending on the last direction
             if last_direction == 'forward':
                 cs_left = self.csbr
                 cs_right = self.csbl
