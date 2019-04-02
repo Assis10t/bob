@@ -63,6 +63,8 @@ class FollowPath:
                     line_follower.move_backward_for_a_little_bit()
                 elif p == 'move_forward_a_little':
                     line_follower.move_forward_for_a_little_bit()
+                elif p == 'reset':
+                    line_follower.reset_from_move()
                 else:
                     print("Wrong command given. What does", p, "mean?")
         line_follower.stop()

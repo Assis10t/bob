@@ -244,14 +244,18 @@ class FollowLine:
     def move_away_from_shelf_upper(self):
         # move out until black is seen
         print('move back: upper')
-        self.cm.run_timed(time_sp=500, speed_sp=self.SIDEWAYS_SPEED)
-        sleep(0.5)
+        self.cm.run_timed(time_sp=600, speed_sp=self.SIDEWAYS_SPEED)
+        sleep(0.6)
 
     def prep_for_upper(self):
         # move out until black is seen
         print('prep for upper')
-        self.cm.run_timed(time_sp=200, speed_sp=self.SIDEWAYS_SPEED)
-        sleep(0.2)
+        self.cm.run_timed(time_sp=400, speed_sp=self.SIDEWAYS_SPEED)
+        sleep(0.4)
+    def reset_from_move(self):
+        print('reset')
+        self.cm.run_timed(time_sp=350, speed_sp=-self.SIDEWAYS_SPEED)
+        sleep(0.4)
     def stop_shelf_movement(self):
         self.cm.stop(stop_action='brake')
 

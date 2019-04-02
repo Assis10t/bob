@@ -48,6 +48,8 @@ class EV3Listener:
                         self.path_follower.go(['move_forward_a_little'])
                     elif str_instruction == 'move_back_a_little':
                         self.path_follower.go(['move_back_a_little'])
+                    elif str_instruction == 'reset':
+                        self.path_follower.go(['reset'])
                     else:
                         movement = json.loads(str_instruction)
                         self.path_follower.go([extract(movement)])
