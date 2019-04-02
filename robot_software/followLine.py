@@ -11,7 +11,7 @@ class FollowLine:
 
 
     MARKING_NUMBER = 1  # number of consecutive colour readings to detect marking
-    MARKING_INTERVAL = 1.3  # time between marking checks in seconds
+    MARKING_INTERVAL = 1.6  # time between marking checks in seconds
     reverse = False
 
     BLACK = 1  # black reading from colour sensor in COL-COLOR mode
@@ -264,4 +264,4 @@ class FollowLine:
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
-        ev3.Sound.speak("Whack").wait()
+        #ev3.Sound.speak("Whack").wait()
