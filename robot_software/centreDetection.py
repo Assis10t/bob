@@ -1,14 +1,13 @@
 #! /usr/bin/env python3
 import cv2
 import numpy as np
-from followLine import FollowLine
 
-cap = cv2.VideoCapture(0)
-cap_width = cap.get(3)
-cap_height = cap.get(4)
-OBJECT_THRESHOLD = 0.2 #
+def centre_detection():
+    cap = cv2.VideoCapture(0)
+    cap_width = cap.get(3)
+    cap_height = cap.get(4)
+    OBJECT_THRESHOLD = 0.2 # proportion of area that has to be filled
 
-for i in range(5000):
     # Capture frame-by-frame
     ret, frame = cap.read()
     edges = cv2.Canny(frame,100,200)
@@ -25,12 +24,12 @@ for i in range(5000):
     # This applies a dilate that makes the binary region larger (the more iterations the larger it becomes)
     mask = cv2.dilate(edges, kernel, iterations=5)
 
-    cv2.imshow('frame', frame)
-    cv2.waitKey(1)
-    cv2.imshow('edges', edges)
-    cv2.waitKey(1)
-    cv2.imshow('mask', mask)
-    cv2.waitKey(1)
+    #cv2.imshow('frame', frame)
+    #cv2.waitKey(1)
+    #cv2.imshow('edges', edges)
+    #cv2.waitKey(1)
+    #cv2.imshow('mask', mask)
+    #cv2.waitKey(1)
 
     # Find contours
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -42,16 +41,20 @@ for i in range(5000):
     else:
         print('no object visible')
         centre = [-1,-1]
+        return('empty')
 
     print(centre)
-    line_follower = FollowLine()
+    area = cv2.contourArea(obj)
 
-    #if contours.[0[]
-
-    if centre[0] < cap_width*1/4:
-        # TODO: move forward
-    elif centre[0] > cap_width*3/4:
-        # TODO: move backward
+    if (area > OBJECT_THRESHOLD):
+        if centre[0] < cap_width*1/4:
+            return('left')
+        elif centre[0] > cap_width*3/4:
+            return('right')
+        else:
+            return('centre')
+    else:
+        return('empty')
 
 
 

@@ -59,6 +59,10 @@ class FollowPath:
                     line_follower.stop_shelf_movement()
                 elif p == 'prep_for_upper':
                     line_follower.prep_for_upper()
+                elif p == 'move_back_a_little':
+                    line_follower.move_backward_for_a_little_bit()
+                elif p == 'move_forward_a_little':
+                    line_follower.move_forward_for_a_little_bit()
                 else:
                     print("Wrong command given. What does", p, "mean?")
         line_follower.stop()
