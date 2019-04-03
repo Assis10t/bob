@@ -121,8 +121,8 @@ class FollowLine:
         # Set the speed of the motors
         speed_left = self.limit_speed(self.MOTOR_SPEED + torque)
         speed_right = self.limit_speed(self.MOTOR_SPEED - torque)
-        print('Speed left:', speed_left)
-        print('Speed right:', speed_right)
+        #print('Speed left:', speed_left)
+        #print('Speed right:', speed_right)
 
         # run motors
         motor_left.run_timed(time_sp=self.DT, speed_sp=speed_left * self.reverse)
@@ -195,11 +195,11 @@ class FollowLine:
             if direction == 'left':
                 self.cm.run_timed(time_sp=self.DT, speed_sp=self.SIDEWAYS_SPEED)
                 sleep(self.DT / 1000)
-                self.count_markings(cs_left, cs_left, self.BLACK)
+                self.count_markings(cs_left, cs_left, self.GREEN)
             if direction == 'right':
                 self.cm.run_timed(time_sp=self.DT, speed_sp=-self.SIDEWAYS_SPEED)
                 sleep(self.DT / 1000)
-                self.count_markings(cs_right, cs_right, self.BLACK)
+                self.count_markings(cs_right, cs_right, self.GREEN)
 
             if self.marker_counter >= distance:
                 return
