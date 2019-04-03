@@ -92,6 +92,7 @@ class RobotJobListener():
                 approach_vector= instruction['parameters']['direction']
                 res = self.reliable_send_data(self.ev3_target,str(instruction))
     def centre_self(self,approach_vector):
+        time.sleep(2)
         position = centre_detection()
         attempts = 0
         attempt_threshold = 5
@@ -109,7 +110,7 @@ class RobotJobListener():
             #if not keep on moving
             print('av: {}'.format(approach_vector))
             if approach_vector == '':
-                approach_vector = 'forward'
+                approach_vector = 'backward'
             
             elif position == 'empty':
                 if found:
@@ -136,7 +137,7 @@ class RobotJobListener():
                 self.reliable_send_data(self.ev3_target, "prep_for_upper")
             self.reliable_send_data(self.rasp_target,"lift {}".format(height))
             
-            #self.centre_self(approach_vector)
+            self.centre_self(approach_vector)
             self.reliable_send_data(self.rasp_target,"prepare")
 
             thread_manager['bumped'] = False
