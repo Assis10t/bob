@@ -16,7 +16,6 @@ class FollowPath:
         self.runner = None
         self.last_direction = '' # saves previous direction Bob moved in
 
-
     def go(self, path):
         print(path)
         line_follower = FollowLine()

@@ -11,7 +11,6 @@ from lift import Lift
 from rasppi_coordinator import RobotJobListener
 from rasppi_listener import listen
 
-
 class Logger(object):
     def __init__(self, onRobot):
         self.useTerminal = not onRobot
