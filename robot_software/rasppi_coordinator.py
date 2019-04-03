@@ -92,7 +92,7 @@ class RobotJobListener():
                 approach_vector= instruction['parameters']['direction']
                 res = self.reliable_send_data(self.ev3_target,str(instruction))
     def centre_self(self,approach_vector):
-        time.sleep(2)
+        time.sleep(0.5)
         position = centre_detection()
         attempts = 0
         attempt_threshold = 5
@@ -136,8 +136,8 @@ class RobotJobListener():
             if (int(height) >= 1):
                 self.reliable_send_data(self.ev3_target, "prep_for_upper")
             self.reliable_send_data(self.rasp_target,"lift {}".format(height))
-            
-            self.centre_self(approach_vector)
+            if height < 1:
+                self.centre_self(approach_vector)
             self.reliable_send_data(self.rasp_target,"prepare")
 
             thread_manager['bumped'] = False
@@ -149,6 +149,8 @@ class RobotJobListener():
             print('bump!')
             self.reliable_send_data(self.ev3_target,"stop_shelf")
             thread_manager['bumped'] = True
+            status = None
+        
             if int(height) >= 1:
                 self.reliable_send_data(self.rasp_target, "upper_grab")
                 self.reliable_send_data(self.ev3_target,"move_out_upper")
@@ -157,9 +159,19 @@ class RobotJobListener():
             else:
                 self.reliable_send_data(self.rasp_target,"grab")
                 self.reliable_send_data(self.rasp_target, "retract")
-                self.reliable_send_data(self.ev3_target,"move_out")
-                
-            
+            status = centre_detection()
+            try:
+                while status != 'empty' and height < 1:
+                    self.reliable_send_data(self.rasp_target,"prepare")
+                    self.reliable_send_data(self.rasp_target,"grab")
+                    self.reliable_send_data(self.rasp_target, "retract")
+            except KeyboardInterrupt:
+                thread_manager['bumped'] = True
+                return
+
+            status = centre_detection()
+            self.reliable_send_data(self.ev3_target,"move_out")
+
             self.reliable_send_data(self.rasp_target,"lift 0")
 
             return

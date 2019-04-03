@@ -40,6 +40,8 @@ class FollowPath:
                             line_follower.set_cs_modes('backward')
                             print('SIDEWAYS: moved backward')
                             line_follower.run_backward(1, self.BLUE)
+                        else:
+                            print(self.last_direction == 'backward')
                         print('LAST DIRECTION:', self.last_direction)
                         line_follower.set_cs_modes(direction)
                         line_follower.run_sideways(distance, direction, self.last_direction)
