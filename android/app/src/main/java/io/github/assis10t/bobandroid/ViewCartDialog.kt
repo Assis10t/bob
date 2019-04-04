@@ -95,7 +95,7 @@ class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): 
         override fun onBindViewHolder(vh: ViewHolder, pos: Int) {
             val item = items[pos]
             vh.name.text = item.name
-            vh.quantity.text = "${item.quantity}"
+            vh.quantity.text = "${item.quantity?.toInt()}"
             vh.price.text =
                 if (item.unit == null)
                     "£${"%.2f".format(item.price)}"
