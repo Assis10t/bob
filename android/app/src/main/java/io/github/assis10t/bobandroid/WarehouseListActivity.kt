@@ -14,6 +14,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.*
 import android.widget.TextView
 import android.widget.Toast
@@ -23,20 +24,32 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import io.github.assis10t.bobandroid.pojo.Warehouse
 import kotlinx.android.synthetic.main.activity_warehouse_list.*
+import timber.log.Timber
 
 // Location permission logic from https://github.com/oktay-sen/Coinz
 class WarehouseListActivity : ActivityWithLoginMenu(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+    private var markers: Map<Marker, Warehouse> = mapOf()
 
     private val PERMISSION_REQUEST = 3749
     private val LOCATION_PERMISSIONS = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION
     )
+
+    companion object {
+        fun openWarehouse(context: Context, warehouse: Warehouse) {
+            val intent = Intent(context, WarehouseActivity::class.java)
+            intent.putExtra("warehouseId", warehouse._id)
+            intent.putExtra("warehouseName", warehouse.name)
+            context.startActivity(intent)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,12 +98,12 @@ class WarehouseListActivity : ActivityWithLoginMenu(), OnMapReadyCallback {
             adapter.setItems(warehouses!!)
 
             mMap.clear()
-            warehouses.forEach { warehouse ->
+            markers = warehouses.associate { warehouse ->
                 mMap.addMarker(
                     MarkerOptions()
                         .position(warehouse.location!!.asLatLng())
                         .title(warehouse.name)
-                )
+                ) to warehouse
             }
         }
     }
@@ -115,6 +128,15 @@ class WarehouseListActivity : ActivityWithLoginMenu(), OnMapReadyCallback {
 //        val sydney = LatLng(-34.0, 151.0)
 //        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+        mMap.setOnInfoWindowClickListener { marker ->
+            val warehouse = markers[marker]
+            if (warehouse == null) {
+                Timber.e("Marker does not have warehouse associated to it!")
+                return@setOnInfoWindowClickListener
+            }
+            openWarehouse(this, warehouse)
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -175,10 +197,7 @@ class WarehouseListActivity : ActivityWithLoginMenu(), OnMapReadyCallback {
             vh.title.text = warehouseList[pos].name
             vh.description.text = "Supermarket"
             vh.container.setOnClickListener {v ->
-                val intent = Intent(v.context, WarehouseActivity::class.java)
-                intent.putExtra("warehouseId", warehouseList[pos]._id)
-                intent.putExtra("warehouseName", warehouseList[pos].name)
-                v.context.startActivity(intent)
+                openWarehouse(v.context, warehouseList[pos])
             }
         }
 
