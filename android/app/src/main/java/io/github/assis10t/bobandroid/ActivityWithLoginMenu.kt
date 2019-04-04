@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import org.jetbrains.anko.toast
 import timber.log.Timber
@@ -22,9 +23,9 @@ open class ActivityWithLoginMenu: AppCompatActivity() {
         invalidateOptionsMenu()
         val username = ServerConnection().getCurrentUsername(this)
         if (username != null) {
-            Snackbar.make(findViewById(android.R.id.content), "Welcome, $username!", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(snackbarView(this), "Welcome, $username!", Snackbar.LENGTH_SHORT).show()
         } else {
-            Snackbar.make(findViewById(android.R.id.content), "Logged out successfully.", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(snackbarView(this), "Logged out successfully.", Snackbar.LENGTH_LONG).show()
         }
     }
 

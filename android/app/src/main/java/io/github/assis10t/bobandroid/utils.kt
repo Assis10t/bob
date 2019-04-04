@@ -1,11 +1,13 @@
 package io.github.assis10t.bobandroid
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.util.TypedValue
 import android.provider.SyncStateContract.Helpers.update
 import android.util.Base64
+import android.view.View
 import com.google.gson.Gson
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
@@ -85,3 +87,7 @@ fun generateQRCode(str: String): Bitmap {
     val bitMatrix = MultiFormatWriter().encode(str, BarcodeFormat.QR_CODE, 300, 300)
     return BarcodeEncoder().createBitmap(bitMatrix)
 }
+
+fun snackbarView(activity: Activity): View
+        = activity.findViewById(R.id.view_cart)
+        ?: activity.findViewById(android.R.id.content)

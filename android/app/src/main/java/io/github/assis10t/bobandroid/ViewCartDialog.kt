@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -43,6 +44,13 @@ class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): 
         clear.setOnClickListener {
             clearCart(context)
             activity.refreshItems()
+            Snackbar.make(snackbarView(activity), "Cleared your shopping cart", Snackbar.LENGTH_LONG)
+                .setAction("Undo") {
+                    data.forEach { addToCart(activity, it) }
+                    ViewCartDialog(activity, warehouseId).show()
+                    activity.refreshItems()
+                }
+                .show()
             dismiss()
         }
 
