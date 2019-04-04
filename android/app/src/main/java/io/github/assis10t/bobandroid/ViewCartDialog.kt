@@ -42,8 +42,7 @@ class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): 
 
         clear.setOnClickListener {
             clearCart(context)
-            if (context is WarehouseActivity)
-                (context as WarehouseActivity).refreshItems()
+            activity.refreshItems()
             dismiss()
         }
 
