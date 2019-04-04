@@ -8,6 +8,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import io.github.assis10t.bobandroid.pojo.Item
@@ -59,7 +60,11 @@ class AddToCartDialog(val activity: WarehouseActivity, val item: Item): Dialog(a
                 item.price,
                 item.size
             )
-            addToCart(context, cartItem)
+            val success = addToCart(context, cartItem)
+            if (!success) {
+                Toast.makeText(context, "Couldn't add item to cart.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             activity.refreshItems()
             Timber.d("Cart: ${getCart(context)}")
             val dialog = AddedToCartDialog(context)

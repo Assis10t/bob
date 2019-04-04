@@ -19,7 +19,7 @@ class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val data = getCart(context)
+        val data = getCart(context).items.values.toList()
         if (data.isEmpty()) {
             setContentView(R.layout.dialog_view_cart_empty)
             return
