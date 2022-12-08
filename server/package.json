@@ -29,10 +29,10 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
-    "body-parser": "^1.18.3",
+    "body-parser": "^1.20.1",
     "bonjour": "^3.5.0",
     "cors": "^2.8.5",
-    "express": "^4.16.4",
+    "express": "^4.18.2",
     "mongodb": "^3.1.13",
     "pathfinding": "^0.4.18",
     "mongodb-memory-server": "^3.1.1"
